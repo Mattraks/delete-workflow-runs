@@ -6,3 +6,16 @@ inputs:
   token:
     description: 'A personal access token (PAT) to authenticate.'
     required: true
+
+  repository:
+    description: 'The name of the repository.'
+    required: true
+    default: ${{ github.repository }}
+
+runs:
+  using: 'node12'
+  main: 'dist/index.js'
+
+branding:
+  icon: 'delete'
+  color: 'red'
