@@ -1,0 +1,8 @@
+name: 'Delete workflow runs'
+description: 'An action to delete workflow runs in a repository.'
+author: 'Bright Ran'
+
+inputs:
+  token:
+    description: 'A personal access token (PAT) to authenticate.'
+    required: true
