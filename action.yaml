@@ -12,6 +12,10 @@ inputs:
     required: true
     default: ${{ github.repository }}
 
+  days:
+    description: 'The number of days.'
+    required: true
+
 runs:
   using: 'node12'
   main: 'dist/index.js'
