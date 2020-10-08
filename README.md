@@ -10,4 +10,21 @@ The action will calculate the number of days that each workflow run has been ret
 #### Required: YES
 A personal access token (PAT) to authenticate. The PAT must have the **`repo`** scope.
 
+### 2. `repository`
+#### Required: YES
+#### Default: `${{ github.repository }}`
+The name of the repository where the workflow runs are on.
+
+### 3. `retain_days`
+#### Required: YES
+#### Default: 90
+The number of days that is used to compare with the retention days of each workflow. If the retention days of the workflow run has reached (equal to or greater than) this number, action deletes the workflow run.
+
+##
+
+## Examples
+##
+
+## License
+The scripts and documentation in this project are released under the [MIT License](https://github.com/ActionsRML/delete-workflow-runs/blob/main/LICENSE).
 ##
