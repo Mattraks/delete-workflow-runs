@@ -15,12 +15,12 @@ async function run() {
     const repo_name = splitRepository[1];
     
     var page_number = 1;
-    var lenght = 100;
     var del_runs = new Array();
+    const { Octokit } = require("@octokit/rest");
+    const octokit = new Octokit({ auth: token });
+
     while (true) {
-      // Execute the API "List workflow runs for a repository", see 'https://octokit.github.io/rest.js/v18#actions-list-workflow-runs-for-repo'
-      const { Octokit } = require("@octokit/rest");
-      const octokit = new Octokit({ auth: token });
+      // Execute the API "List workflow runs for a repository", see 'https://octokit.github.io/rest.js/v18#actions-list-workflow-runs-for-repo'     
       const response = await octokit.actions.listWorkflowRunsForRepo({
         owner: repo_owner,
         repo: repo_name,
@@ -50,6 +50,27 @@ async function run() {
         break;
       }
       page_number++;
+    }
+
+    const arr_length = del_runs.length;
+    if (arr_length < 1) {
+      console.log(`No workflow runs need to be deleted.`);
+    }
+    else {
+      for (index = 0; index < arr_length; index++) {
+        // Execute the API "Delete a workflow run", see 'https://octokit.github.io/rest.js/v18#actions-delete-workflow-run'
+        const run_id = del_runs[index];
+
+        await octokit.actions.deleteWorkflowRun({
+          owner: repo_owner,
+          repo: repo_name,
+          run_id: run_id
+        });
+
+        console.log(`%d workflow runs are deleted.`, run_id);
+      }
+
+      console.log(`No workflow runs need to be deleted.`);
     }
   }
   catch (error) {
