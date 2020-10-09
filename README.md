@@ -18,7 +18,7 @@ The name of the repository where the workflow runs are on.
 ### 3. `retain_days`
 #### Required: YES
 #### Default: 90
-The number of days that is used to compare with the retention days of each workflow. If the retention days of the workflow run has reached (equal to or greater than) this number, the workflow run will be deleted.
+The number of days that is used to compare with the retention days of each workflow.
 
 ##
 
