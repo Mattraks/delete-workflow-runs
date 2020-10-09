@@ -16,6 +16,7 @@ async function run() {
     
     var page_number = 1;
     var lenght = 100;
+    var del_runs = new Array();
     while (true) {
       // Execute the API "List workflow runs for a repository", see 'https://octokit.github.io/rest.js/v18#actions-list-workflow-runs-for-repo'
       const { Octokit } = require("@octokit/rest");
@@ -33,6 +34,16 @@ async function run() {
         break;
       }
       else {
+        for (index = 0; index < lenght; index++) {
+          var created_at = new Date(response.data.workflow_runs[index].created_at);
+          var current = new Date();
+          var ELAPSE_ms = current.getTime() - created_at.getTime();
+          var ELAPSE_days = ELAPSE_ms / (1000 * 3600 * 24);
+          
+          if (ELAPSE_days >= retain_days) {
+            del_runs.push(response.data.workflow_runs[index].id);
+          }
+        }
       }
       
       if (lenght < 100) {
