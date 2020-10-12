@@ -22,7 +22,7 @@ The number of days that is used to compare with the retention days of each workf
 ##
 
 ## Examples
-### Using scheduled workflow, see [schedule](https://docs.github.com/en/free-pro-team@latest/actions/reference/events-that-trigger-workflows#schedule) event.
+### Using scheduled workflow, see [schedule event](https://docs.github.com/en/free-pro-team@latest/actions/reference/events-that-trigger-workflows#schedule).
 > Using scheduled workflow is the recommended way that can periodically delete old workflow runs.
 ```yaml
 name: Delete old workflow runs
