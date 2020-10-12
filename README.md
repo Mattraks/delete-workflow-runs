@@ -38,7 +38,7 @@ jobs:
       - name: Delete workflow runs
         uses: ActionsRML/delete-workflow-runs@main
         with:
-          token: ${{ secrets.API_AUTH_TOKEN }}
+          token: ${{ secrets.AUTH_PAT }}
           repository: owner-name/repo-name
           retain_days: 30
   
