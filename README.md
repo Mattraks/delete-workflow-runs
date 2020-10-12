@@ -19,10 +19,30 @@ The name of the repository where the workflow runs are on.
 #### Required: YES
 #### Default: 90
 The number of days that is used to compare with the retention days of each workflow.
-
 ##
 
 ## Examples
+> The recommended way to use this action is in a scheduled workflow or a manual triggered workflow.
+### Using in a scheduled workflow, see [schedule](https://docs.github.com/en/free-pro-team@latest/actions/reference/events-that-trigger-workflows#schedule) event.
+```yaml
+name: Delete old workflow runs
+on:
+  schedule:
+    - cron: '0 0 1 * *'
+# Run monthly, at 00:00 on the 1st day of month.
+
+jobs:
+  del_runs:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Delete workflow runs
+        uses: ActionsRML/delete-workflow-runs@main
+        with:
+          token: ${{ secrets.API_AUTH_TOKEN }}
+          repository: owner-name/repo-name
+          retain_days: 30
+  
+```
 ##
 
 ## License
