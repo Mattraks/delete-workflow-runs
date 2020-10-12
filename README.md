@@ -22,8 +22,8 @@ The number of days that is used to compare with the retention days of each workf
 ##
 
 ## Examples
-> The recommended way to use this action is in a scheduled workflow or a manual triggered workflow.
 ### Using in a scheduled workflow, see [schedule](https://docs.github.com/en/free-pro-team@latest/actions/reference/events-that-trigger-workflows#schedule) event.
+> Using scheduled workflow is the recommended way.
 ```yaml
 name: Delete old workflow runs
 on:
