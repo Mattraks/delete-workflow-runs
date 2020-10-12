@@ -8,7 +8,7 @@ The action will calculate the number of days that each workflow run has been ret
 ## Inputs
 ### 1. `token`
 #### Required: YES
-A personal access token (PAT) to authenticate. The PAT must have the **`repo`** scope.
+A personal access token (PAT) to authenticate. The PAT must have the **`repo`** scope. More details, see "[Creating a personal access token](https://docs.github.com/en/free-pro-team@latest/github/authenticating-to-github/creating-a-personal-access-token)".
 
 ### 2. `repository`
 #### Required: YES
