@@ -22,7 +22,7 @@ The number of days that is used to compare with the retention days of each workf
 ##
 
 ## Examples
-### Using scheduled workflow, see [schedule event](https://docs.github.com/en/free-pro-team@latest/actions/reference/events-that-trigger-workflows#schedule).
+### In scheduled workflow, see [schedule event](https://docs.github.com/en/free-pro-team@latest/actions/reference/events-that-trigger-workflows#schedule).
 > **Tip:** Using scheduled workflow is the recommended way that can periodically delete old workflow runs.
 ```yaml
 name: Delete old workflow runs
@@ -39,9 +39,32 @@ jobs:
         uses: ActionsRML/delete-workflow-runs@main
         with:
           token: ${{ secrets.AUTH_PAT }}
-          repository: owner-name/repo-name
+          repository: ${{ github.repository }}
           retain_days: 30
   
+```
+
+### In manual triggered workflow, see [workflow_dispatch event](https://docs.github.com/en/free-pro-team@latest/actions/reference/events-that-trigger-workflows#workflow_dispatch).
+```yaml
+name: Delete old workflow runs
+on:
+  workflow_dispatch:
+    inputs:
+      days:
+        description: 'Number of days.'
+        required: true
+        default: 90
+
+jobs:
+  del_runs:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Delete workflow runs
+        uses: ActionsRML/delete-workflow-runs@main
+        with:
+          token: ${{ secrets.AUTH_PAT }}
+          repository: ${{ github.repository }}
+          retain_days: ${{ github.event.inputs.days }}
 ```
 ##
 
