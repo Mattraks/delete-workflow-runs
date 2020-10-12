@@ -41,7 +41,6 @@ jobs:
           token: ${{ secrets.AUTH_PAT }}
           repository: ${{ github.repository }}
           retain_days: 30
-  
 ```
 
 ### In manual triggered workflow, see [workflow_dispatch event](https://docs.github.com/en/free-pro-team@latest/actions/reference/events-that-trigger-workflows#workflow_dispatch).
