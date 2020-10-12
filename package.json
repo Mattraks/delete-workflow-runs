@@ -1,0 +1,24 @@
+{
+  "name": "delete-workflow-runs",
+  "version": "1.0.0",
+  "description": "The GitHub action to delete workflow runs in a repository.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ActionsRML/delete-workflow-runs.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/ActionsRML/delete-workflow-runs/issues"
+  },
+  "homepage": "https://github.com/ActionsRML/delete-workflow-runs#readme",
+  "dependencies": {
+    "@actions/core": "^1.2.6",
+    "@octokit/rest": "^18.0.6"
+  }
+}

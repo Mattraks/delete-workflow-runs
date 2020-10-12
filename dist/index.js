@@ -60,17 +60,16 @@ async function run() {
       for (index = 0; index < arr_length; index++) {
         // Execute the API "Delete a workflow run", see 'https://octokit.github.io/rest.js/v18#actions-delete-workflow-run'
         const run_id = del_runs[index];
-
         await octokit.actions.deleteWorkflowRun({
           owner: repo_owner,
           repo: repo_name,
           run_id: run_id
         });
 
-        console.log(`%d workflow runs are deleted.`, run_id);
+        console.log(`Delete workflow run ${run_id}`);
       }
 
-      console.log(`No workflow runs need to be deleted.`);
+      console.log(`${arr_length} workflow runs are deleted.`);
     }
   }
   catch (error) {
