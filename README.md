@@ -44,7 +44,8 @@ jobs:
 ```
 
 ### In manual triggered workflow, see [workflow_dispatch event](https://docs.github.com/en/free-pro-team@latest/actions/reference/events-that-trigger-workflows#workflow_dispatch).
-> In this way, you can manually trigger the workflow at any time to delete old workflow runs.
+> In this way, you can manually trigger the workflow at any time to delete old workflow runs. <br/>
+![manual workflow](https://github.com/ActionsRML/delete-workflow-runs/blob/main/img/example.PNG)
 ```yaml
 name: Delete old workflow runs
 on:
@@ -66,7 +67,6 @@ jobs:
           repository: ${{ github.repository }}
           retain_days: ${{ github.event.inputs.days }}
 ```
-![manual workflow](https://github.com/ActionsRML/delete-workflow-runs/blob/main/img/example.PNG)
 ##
 
 ## License
