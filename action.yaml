@@ -4,8 +4,9 @@ author: 'Bright Ran'
 
 inputs:
   token:
-    description: 'A personal access token (PAT) to authenticate.'
+    description: 'The token used to authenticate.'
     required: true
+    default: ${{ github.token }}
 
   repository:
     description: 'The name of the repository.'
