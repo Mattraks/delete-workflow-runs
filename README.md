@@ -8,7 +8,10 @@ The action will calculate the number of days that each workflow run has been ret
 ## Inputs
 ### 1. `token`
 #### Required: YES
-A personal access token (PAT) to authenticate. The PAT must have the **`repo`** scope. More details, see "[Creating a personal access token](https://docs.github.com/en/free-pro-team@latest/github/authenticating-to-github/creating-a-personal-access-token)".
+#### Default: `${{ github.token }}`
+The token used to authenticate.
+* If the deledted workflow runs are in the current repository where the action is running, using the [**`GITHUB_TOKEN`**](https://docs.github.com/en/free-pro-team@latest/actions/reference/authentication-in-a-workflow) (**`github.token`**) is OK.
+* If the deledted workflow runs are in another repository, you need to use a personal access token (PAT) that must have the **`repo`** scope. More details, see "[Creating a personal access token](https://docs.github.com/en/free-pro-team@latest/github/authenticating-to-github/creating-a-personal-access-token)".
 
 ### 2. `repository`
 #### Required: YES
