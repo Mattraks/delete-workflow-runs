@@ -1,9 +1,18 @@
-# delete-workflow-runs v1
+# delete-workflow-runs v2
 The GitHub action to delete workflow runs in a repository. This action (written in JavaScript) wraps two Workflow Runs API:
-* [**List workflow runs for a repository**](https://docs.github.com/en/free-pro-team@latest/rest/reference/actions#list-workflow-runs-for-a-repository) -- Lists all workflow runs for a repository.
+* [**List repository workflows**](https://docs.github.com/en/free-pro-team@latest/rest/reference/actions#list-repository-workflows) -- Lists the workflows in a repository.
+
+* [**List workflow runs**](https://docs.github.com/en/free-pro-team@latest/rest/reference/actions#list-workflow-runs) -- List all workflow runs for a workflow.
+
 * [**Delete a workflow run**](https://docs.github.com/en/free-pro-team@latest/rest/reference/actions#delete-a-workflow-run) -- Delete a specific workflow run.
 
 The action will calculate the number of days that each workflow run has been retained so far, then use this number to compare with the number you specify for the input parameter "[**`retain_days`**](#3-retain_days)". If the retention days of the workflow run has reached (equal to or greater than) the specified number, the workflow run will be deleted.
+
+## What's new?
+* Add the input parameter "[**`keep_minimum_runs`**](#4-keep_minimum_runs)". Whit this input parameter, you can specify the number of the minimum runs to keep for each workflow. The specified number of latest runs will be kept for each workflow, even if some of the runs have reached the specified retention days.
+
+* Optimize code to simplify the processes.
+##
 
 ## Inputs
 ### 1. `token`
@@ -22,6 +31,11 @@ The name of the repository where the workflow runs are on.
 #### Required: YES
 #### Default: 90
 The number of days that is used to compare with the retention days of each workflow.
+
+### 4. `keep_minimum_runs`
+#### Required: YES
+#### Default: 6
+The minimum runs to keep for each workflow.
 ##
 
 ## Examples

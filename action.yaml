@@ -18,6 +18,11 @@ inputs:
     required: true
     default: 90
 
+  keep_minimum_runs:
+    description: 'The minimum runs to keep for each workflow.'
+    required: true
+    default: 6
+
 runs:
   using: 'node12'
   main: 'dist/index.js'

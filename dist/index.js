@@ -5,6 +5,7 @@ async function run() {
     const token = core.getInput('token');
     const repository = core.getInput('repository');
     const retain_days = core.getInput('retain_days');
+    const keep_minimum_runs = core.getInput('keep_minimum_runs');
     
     // Split the input 'repository' (format {owner}/{repo}) to be {owner} and {repo}
     const splitRepository = repository.split('/');
@@ -52,7 +53,7 @@ async function run() {
       page_number++;
     }
 
-    const arr_length = del_runs.length;
+    const arr_length = del_runs.length - keep_minimum_runs;
     if (arr_length < 1) {
       console.log(`No workflow runs need to be deleted.`);
     }
