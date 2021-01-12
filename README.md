@@ -53,7 +53,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Delete workflow runs
-        uses: ActionsRML/delete-workflow-runs@main
+        uses: Mattraks/delete-workflow-runs@main
         with:
           token: ${{ secrets.AUTH_PAT }}
           repository: ${{ github.repository }}
@@ -62,7 +62,7 @@ jobs:
 
 ### In manual triggered workflow, see [workflow_dispatch event](https://docs.github.com/en/free-pro-team@latest/actions/reference/events-that-trigger-workflows#workflow_dispatch).
 > In this way, you can manually trigger the workflow at any time to delete old workflow runs. <br/>
-![manual workflow](https://github.com/ActionsRML/delete-workflow-runs/blob/main/img/example.PNG)
+![manual workflow](https://github.com/Mattraks/delete-workflow-runs/blob/main/img/example.PNG)
 ```yaml
 name: Delete old workflow runs
 on:
@@ -78,7 +78,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Delete workflow runs
-        uses: ActionsRML/delete-workflow-runs@main
+        uses: Mattraks/delete-workflow-runs@main
         with:
           token: ${{ secrets.AUTH_PAT }}
           repository: ${{ github.repository }}
@@ -87,5 +87,5 @@ jobs:
 ##
 
 ## License
-The scripts and documentation in this project are released under the [MIT License](https://github.com/ActionsRML/delete-workflow-runs/blob/main/LICENSE).
+The scripts and documentation in this project are released under the [MIT License](https://github.com/Mattraks/delete-workflow-runs/blob/main/LICENSE).
 ##
