@@ -6,7 +6,7 @@ async function run() {
     const repository = core.getInput('repository');
     const retain_days = core.getInput('retain_days');
     const keep_minimum_runs = core.getInput('keep_minimum_runs');
-    
+
     // Split the input 'repository' (format {owner}/{repo}) to be {owner} and {repo}
     const splitRepository = repository.split('/');
     if (splitRepository.length !== 2 || !splitRepository[0] || !splitRepository[1]) {
@@ -29,13 +29,21 @@ async function run() {
         page: page_number
       });
       
-      const lenght = response.data.workflow_runs.length;
+      const length = response.data.workflow_runs.length;
       
-      if (lenght < 1) {
+      if (length < 1) {
         break;
       }
       else {
-        for (index = 0; index < lenght; index++) {
+        for (index = 0; index < length; index++) {
+
+          core.debug(`run id=${response.data.workflow_runs[index].id} status=${response.data.workflow_runs[index].status}`)
+
+          if(response.data.workflow_runs[index].status !== "completed") {
+            console.log(`👻 Skipped workflow run ${response.data.workflow_runs[index].id} is in ${response.data.workflow_runs[index].status} state`);
+            continue;            
+          }
+
           var created_at = new Date(response.data.workflow_runs[index].created_at);
           var current = new Date();
           var ELAPSE_ms = current.getTime() - created_at.getTime();
@@ -47,7 +55,7 @@ async function run() {
         }
       }
       
-      if (lenght < 100) {
+      if (length < 100) {
         break;
       }
       page_number++;
@@ -61,6 +69,9 @@ async function run() {
       for (index = 0; index < arr_length; index++) {
         // Execute the API "Delete a workflow run", see 'https://octokit.github.io/rest.js/v18#actions-delete-workflow-run'
         const run_id = del_runs[index];
+
+        core.debug(`Deleting workflow run ${run_id}`);     
+
         await octokit.actions.deleteWorkflowRun({
           owner: repo_owner,
           repo: repo_name,
