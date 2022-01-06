@@ -1,6 +1,6 @@
 name: 'Delete workflow runs'
 description: 'An action to delete workflow runs in a repository.'
-author: 'Bright Ran'
+author: 'Mattraks'
 
 inputs:
   token:
@@ -16,7 +16,7 @@ inputs:
   retain_days:
     description: 'The number of days.'
     required: true
-    default: 90
+    default: 30
 
   keep_minimum_runs:
     description: 'The minimum runs to keep for each workflow.'
