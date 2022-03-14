@@ -24,6 +24,7 @@ async function run() {
       core.debug(`Workflow: ${workflow.name} ${workflow.id} ${workflow.state}`);
       let del_runs = new Array();
       let Skip_runs = new Array();
+      let retain_count = 0;
       // Execute the API "List workflow runs for a repository", see 'https://octokit.github.io/rest.js/v18#actions-list-workflow-runs-for-repo'
       const runs = await octokit
         .paginate("GET /repos/:owner/:repo/actions/workflows/:workflow_id/runs", {
@@ -34,6 +35,7 @@ async function run() {
       for (const run of runs) {
         core.debug(`Run: '${workflow.name}' workflow run ${run.id} (status=${run.status})`)
         if (run.status !== "completed") {
+          retain_count++;
           console.log(`👻 Skipped '${workflow.name}' workflow run ${run.id}: it is in '${run.status}' state`);
           continue;
         }
@@ -46,11 +48,12 @@ async function run() {
           del_runs.push(run);
         }
         else {
+          retain_count++;
           console.log(`👻 Skipped '${workflow.name}' workflow run ${run.id}: created at ${run.created_at}`);
         }
       }
       core.debug(`Delete list for '${workflow.name}' is ${del_runs.length} items`);
-      const arr_length = del_runs.length - keep_minimum_runs;
+      const arr_length = del_runs.length - Math.max((keep_minimum_runs - retain_count), 0);
       if (arr_length > 0) {
         del_runs = del_runs.sort((a, b) => { return a.id - b.id; });
         if (keep_minimum_runs !== 0) {
