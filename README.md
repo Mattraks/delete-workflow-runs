@@ -34,6 +34,10 @@ The number of days that is used to compare with the retention days of each workf
 #### Required: YES
 #### Default: 6
 The minimum runs to keep for each workflow.
+
+### 5. `delete_workflow_pattern`
+#### Required: NO
+part of the workflow name. Example, if you want to just delete current workflow then set this to `${{ github.workflow }}`, if not set then it will target all workflows.
 ##
 
 ## Examples
@@ -57,6 +61,7 @@ jobs:
           repository: ${{ github.repository }}
           retain_days: 30
           keep_minimum_runs: 6
+	  delete_workflow_pattern: ${{ github.workflow }}
 ```
 
 ### In manual triggered workflow, see [workflow_dispatch event](https://docs.github.com/en/free-pro-team@latest/actions/reference/events-that-trigger-workflows#workflow_dispatch).
@@ -75,6 +80,9 @@ on:
         description: 'The minimum runs to keep for each workflow.'
         required: true
         default: 6
+      delete_workflow_pattern:
+        description: 'The part of the workflow name.'
+        required: false
 
 jobs:
   del_runs:
@@ -87,6 +95,7 @@ jobs:
           repository: ${{ github.repository }}
           retain_days: ${{ github.event.inputs.days }}
           keep_minimum_runs: ${{ github.event.inputs.minimum_runs }}
+          delete_workflow_pattern: ${{ github.event.inputs.delete_workflow_pattern }}
 ```
 ##
 

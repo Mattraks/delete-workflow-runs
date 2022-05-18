@@ -16,15 +16,13 @@ async function run() {
     const repo_name = splitRepository[1];
     const { Octokit } = require("@octokit/rest");
     const octokit = new Octokit({ auth: token });
-    // const workflows = await octokit
     let workflows = await octokit
       .paginate("GET /repos/:owner/:repo/actions/workflows", {
         owner: repo_owner,
         repo: repo_name,
       });
-    console.log(`💬 found total of ${workflows.length} workflow(s) before filter`);
     if (delete_workflow_pattern) {
-  	console.log(`workflows containing '${delete_workflow_pattern}' will be targeted`);
+  	console.log(`💬 workflows containing '${delete_workflow_pattern}' will be targeted`);
     	workflows = workflows.filter(
           ({ name }) => name.indexOf(delete_workflow_pattern) !== -1
         );
