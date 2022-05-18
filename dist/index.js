@@ -21,14 +21,14 @@ async function run() {
         owner: repo_owner,
         repo: repo_name,
       });
-    console.log(`💬 found total of ${workflows.length} workflow(s) before filter`;
+    console.log(`💬 found total of ${workflows.length} workflow(s) before filter`);
     if (delete_workflow_pattern) {
   	console.log(`workflows containing '${delete_workflow_pattern}' will be targeted`);
     	workflows = workflows.filter(
           ({ name }) => name.indexOf(delete_workflow_pattern) !== -1
         );
     }
-    console.log(`💬 found total of ${workflows.length} workflow(s)`;
+    console.log(`💬 found total of ${workflows.length} workflow(s)`);
     for (const workflow of workflows) {
       core.debug(`Workflow: ${workflow.name} ${workflow.id} ${workflow.state}`);
       let del_runs = new Array();
