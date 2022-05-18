@@ -16,7 +16,8 @@ async function run() {
     const repo_name = splitRepository[1];
     const { Octokit } = require("@octokit/rest");
     const octokit = new Octokit({ auth: token });
-    const workflows = await octokit
+    // const workflows = await octokit
+    let workflows = await octokit
       .paginate("GET /repos/:owner/:repo/actions/workflows", {
         owner: repo_owner,
         repo: repo_name,
