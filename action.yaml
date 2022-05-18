@@ -23,6 +23,10 @@ inputs:
     required: true
     default: 6
 
+  delete_workflow_pattern:
+    description: part of the workflow name. Example, if you want to just delete current workflow then set this to ${{ github.workflow }}, if not set then it will target all workflows.
+    required: false
+
 runs:
   using: 'node12'
   main: 'dist/index.js'
