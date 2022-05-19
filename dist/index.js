@@ -6,6 +6,7 @@ async function run() {
     const repository = core.getInput('repository');
     const retain_days = Number(core.getInput('retain_days'));
     const keep_minimum_runs = Number(core.getInput('keep_minimum_runs'));
+    const delete_workflow_pattern = core.getInput('delete_workflow_pattern');
     // Split the input 'repository' (format {owner}/{repo}) to be {owner} and {repo}
     const splitRepository = repository.split('/');
     if (splitRepository.length !== 2 || !splitRepository[0] || !splitRepository[1]) {
@@ -15,11 +16,18 @@ async function run() {
     const repo_name = splitRepository[1];
     const { Octokit } = require("@octokit/rest");
     const octokit = new Octokit({ auth: token });
-    const workflows = await octokit
+    let workflows = await octokit
       .paginate("GET /repos/:owner/:repo/actions/workflows", {
         owner: repo_owner,
         repo: repo_name,
       });
+    if (delete_workflow_pattern) {
+  	console.log(`💬 workflows containing '${delete_workflow_pattern}' will be targeted`);
+    	workflows = workflows.filter(
+          ({ name }) => name.indexOf(delete_workflow_pattern) !== -1
+        );
+    }
+    console.log(`💬 found total of ${workflows.length} workflow(s)`);
     for (const workflow of workflows) {
       core.debug(`Workflow: ${workflow.name} ${workflow.id} ${workflow.state}`);
       let del_runs = new Array();

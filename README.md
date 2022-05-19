@@ -9,7 +9,7 @@ The GitHub action to delete workflow runs in a repository. This action (written 
 The action will calculate the number of days that each workflow run has been retained so far, then use this number to compare with the number you specify for the input parameter "[**`retain_days`**](#3-retain_days)". If the retention days of the workflow run has reached (equal to or greater than) the specified number, the workflow run will be deleted.
 
 ## What's new?
-* Keep minimum runs feature update.
+* Add the input parameter "[**`delete_workflow_pattern`**](#5-delete_workflow_pattern)". Fill in the specified workflow name, this workflow will be processed, if no workflow is specified, all workflows in the repository will be processed.
 ##
 
 ## Inputs
@@ -34,6 +34,10 @@ The number of days that is used to compare with the retention days of each workf
 #### Required: YES
 #### Default: 6
 The minimum runs to keep for each workflow.
+
+### 5. `delete_workflow_pattern`
+#### Required: NO
+The name of the workflow. if not set then it will target all workflows.
 ##
 
 ## Examples
@@ -75,6 +79,9 @@ on:
         description: 'The minimum runs to keep for each workflow.'
         required: true
         default: 6
+      delete_workflow_pattern:
+        description: 'The name of the workflow. if not set then it will target all workflows.'
+        required: false
 
 jobs:
   del_runs:
@@ -87,6 +94,7 @@ jobs:
           repository: ${{ github.repository }}
           retain_days: ${{ github.event.inputs.days }}
           keep_minimum_runs: ${{ github.event.inputs.minimum_runs }}
+          delete_workflow_pattern: ${{ github.event.inputs.delete_workflow_pattern }}
 ```
 ##
 
