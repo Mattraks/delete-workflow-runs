@@ -37,7 +37,7 @@ The minimum runs to keep for each workflow.
 
 ### 5. `delete_workflow_pattern`
 #### Required: NO
-part of the workflow name. Example, if you want to just delete current workflow then set this to `${{ github.workflow }}`, if not set then it will target all workflows.
+The part of the workflow name. Example, if you want to just delete current workflow then set this to `${{ github.workflow }}`, if not set then it will target all workflows.
 ##
 
 ## Examples
@@ -61,7 +61,7 @@ jobs:
           repository: ${{ github.repository }}
           retain_days: 30
           keep_minimum_runs: 6
-	  delete_workflow_pattern: ${{ github.workflow }}
+          delete_workflow_pattern: ${{ github.workflow }}
 ```
 
 ### In manual triggered workflow, see [workflow_dispatch event](https://docs.github.com/en/free-pro-team@latest/actions/reference/events-that-trigger-workflows#workflow_dispatch).
