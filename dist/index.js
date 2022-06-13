@@ -7,6 +7,8 @@ async function run() {
     const retain_days = Number(core.getInput('retain_days'));
     const keep_minimum_runs = Number(core.getInput('keep_minimum_runs'));
     const delete_workflow_pattern = core.getInput('delete_workflow_pattern');
+    const delete_workflow_by_state_pattern = core.getInput('delete_workflow_by_state_pattern');
+    const dry_run = core.getInput('dry_run');
     // Split the input 'repository' (format {owner}/{repo}) to be {owner} and {repo}
     const splitRepository = repository.split('/');
     if (splitRepository.length !== 2 || !splitRepository[0] || !splitRepository[1]) {
@@ -21,12 +23,24 @@ async function run() {
         owner: repo_owner,
         repo: repo_name,
       });
+
     if (delete_workflow_pattern) {
   	console.log(`💬 workflows containing '${delete_workflow_pattern}' will be targeted`);
     	workflows = workflows.filter(
-          ({ name }) => name.indexOf(delete_workflow_pattern) !== -1
+          ({ name, path }) => {
+            const filename = path.replace(".github/workflows/");
+            return [name, filename].some(x=> x.indexOf(delete_workflow_pattern) !== -1);
+          }
         );
     }
+
+    if (delete_workflow_by_state_pattern) {
+  	console.log(`💬 workflows containing state '${delete_workflow_by_state_pattern}' will be targeted`);
+    	workflows = workflows.filter(
+          ({ state }) => state.indexOf(delete_workflow_by_state_pattern) !== -1
+        );
+    }
+
     console.log(`💬 found total of ${workflows.length} workflow(s)`);
     for (const workflow of workflows) {
       core.debug(`Workflow: ${workflow.name} ${workflow.id} ${workflow.state}`);
@@ -72,11 +86,18 @@ async function run() {
         for (const del of del_runs) {
           core.debug(`Deleting '${workflow.name}' workflow run ${del.id}`);
           // Execute the API "Delete a workflow run", see 'https://octokit.github.io/rest.js/v18#actions-delete-workflow-run'
+
+          if (dry_run) {
+            console.log(`[dry-run] 🚀 Delete run ${del.id} of '${workflow.name}' workflow`);
+            continue;
+          }
+
           await octokit.actions.deleteWorkflowRun({
             owner: repo_owner,
             repo: repo_name,
             run_id: del.id
           });
+
           console.log(`🚀 Delete run ${del.id} of '${workflow.name}' workflow`);
         }
         console.log(`✅ ${arr_length} runs of '${workflow.name}' workflow deleted.`);
