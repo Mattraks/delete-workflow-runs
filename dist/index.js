@@ -25,20 +25,20 @@ async function run() {
       });
 
     if (delete_workflow_pattern) {
-  	console.log(`💬 workflows containing '${delete_workflow_pattern}' will be targeted`);
-    	workflows = workflows.filter(
-          ({ name, path }) => {
-            const filename = path.replace(".github/workflows/");
-            return [name, filename].some(x=> x.indexOf(delete_workflow_pattern) !== -1);
-          }
-        );
+      console.log(`💬 workflows containing '${delete_workflow_pattern}' will be targeted`);
+      workflows = workflows.filter(
+        ({ name, path }) => {
+          const filename = path.replace(".github/workflows/");
+          return [name, filename].some(x => x.indexOf(delete_workflow_pattern) !== -1);
+        }
+      );
     }
 
     if (delete_workflow_by_state_pattern) {
-  	console.log(`💬 workflows containing state '${delete_workflow_by_state_pattern}' will be targeted`);
-    	workflows = workflows.filter(
-          ({ state }) => state.indexOf(delete_workflow_by_state_pattern) !== -1
-        );
+      console.log(`💬 workflows containing state '${delete_workflow_by_state_pattern}' will be targeted`);
+      workflows = workflows.filter(
+        ({ state }) => state.indexOf(delete_workflow_by_state_pattern) !== -1
+      );
     }
 
     console.log(`💬 found total of ${workflows.length} workflow(s)`);
