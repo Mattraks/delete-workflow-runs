@@ -24,7 +24,7 @@ async function run() {
         repo: repo_name,
       });
 
-    if (delete_workflow_pattern) {
+    if (delete_workflow_pattern && delete_workflow_pattern.toLowerCase() !== "all") {
       console.log(`💬 workflows containing '${delete_workflow_pattern}' will be targeted`);
       workflows = workflows.filter(
         ({ name, path }) => {
@@ -34,7 +34,7 @@ async function run() {
       );
     }
 
-    if (delete_workflow_by_state_pattern) {
+    if (delete_workflow_by_state_pattern && delete_workflow_by_state_pattern.toLowerCase() !== "all") {
       console.log(`💬 workflows containing state '${delete_workflow_by_state_pattern}' will be targeted`);
       workflows = workflows.filter(
         ({ state }) => state.indexOf(delete_workflow_by_state_pattern) !== -1
