@@ -40,10 +40,12 @@ The minimum runs to keep for each workflow.
 
 ### 5. `delete_workflow_pattern`
 #### Required: NO
+#### Default: 'all'
 The name or filename of the workflow. if not set then it will target all workflows.
 
 ### 6. `delete_workflow_by_state_pattern`
 #### Required: NO
+#### Default: 'all'
 Remove workflow by state: active, deleted, disabled_fork, disabled_inactivity, disabled_manually
 
 ### 7. `dry_run`
@@ -95,7 +97,15 @@ on:
         required: false
       delete_workflow_by_state_pattern:
         description: 'Remove workflow by state: active, deleted, disabled_fork, disabled_inactivity, disabled_manually'
-        required: false
+        required: true
+        default: "All"
+        type: choice
+        options:
+          - "All"
+          - active
+          - deleted
+          - disabled_inactivity
+          - disabled_manually
       dry_run:
         description: 'Only log actions, do not perform any delete operations.'
         required: false
