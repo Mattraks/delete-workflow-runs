@@ -8,7 +8,8 @@ async function run() {
     const keep_minimum_runs = Number(core.getInput('keep_minimum_runs'));
     const delete_workflow_pattern = core.getInput('delete_workflow_pattern');
     const delete_workflow_by_state_pattern = core.getInput('delete_workflow_by_state_pattern');
-    const dry_run = core.getInput('dry_run');
+    let dry_run = core.getInput('dry_run');
+    dry_run = dry_run && (dry_run === "false" || dry_run === 0 || dry_run === false) ? false : dry_run 
     // Split the input 'repository' (format {owner}/{repo}) to be {owner} and {repo}
     const splitRepository = repository.split('/');
     if (splitRepository.length !== 2 || !splitRepository[0] || !splitRepository[1]) {
