@@ -8,6 +8,10 @@ inputs:
     required: true
     default: ${{ github.token }}
 
+  baseUrl:
+    description: 'The base api url to be used in enterprise github instances'
+    required: false
+    default: "https://api.github.com"
   repository:
     description: 'The name of the repository.'
     required: true
