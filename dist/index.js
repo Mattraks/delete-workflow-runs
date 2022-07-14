@@ -3,6 +3,7 @@ async function run() {
   try {
     // Fetch all the inputs
     const token = core.getInput('token');
+    const url = core.getInput('baseUrl');
     const repository = core.getInput('repository');
     const retain_days = Number(core.getInput('retain_days'));
     const keep_minimum_runs = Number(core.getInput('keep_minimum_runs'));
@@ -17,7 +18,7 @@ async function run() {
     const repo_owner = splitRepository[0];
     const repo_name = splitRepository[1];
     const { Octokit } = require("@octokit/rest");
-    const octokit = new Octokit({ auth: token });
+    const octokit = new Octokit({ auth: token, baseUrl: url });
     let workflows = await octokit
       .paginate("GET /repos/:owner/:repo/actions/workflows", {
         owner: repo_owner,
