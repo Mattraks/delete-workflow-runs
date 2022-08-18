@@ -18,7 +18,7 @@
   },
   "homepage": "https://github.com/Mattraks/delete-workflow-runs#readme",
   "dependencies": {
-    "@actions/core": "^1.8.2",
+    "@actions/core": "^1.9.1",
     "@octokit/rest": "^18.12.0"
   }
 }
