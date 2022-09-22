@@ -9,7 +9,8 @@ The GitHub action to delete workflow runs in a repository. This action (written 
 The action will calculate the number of days that each workflow run has been retained so far, then use this number to compare with the number you specify for the input parameter "[**`retain_days`**](#3-retain_days)". If the retention days of the workflow run has reached (equal to or greater than) the specified number, the workflow run will be deleted.
 
 ## What's new?
-* Add the input parameter "[**`delete_workflow_by_state_pattern`**](#6-delete_workflow_by_state_pattern)" and "[**`dry_run`**](#7-dry_run)". 
+* Add the input parameter "[**`delete_workflow_by_conclusion_pattern`**](#7-delete_workflow_by_conclusion_pattern)" - useful for `skipped` workflow runs.
+* Add the input parameter "[**`delete_workflow_by_state_pattern`**](#6-delete_workflow_by_state_pattern)" and "[**`dry_run`**](#8-dry_run)". 
 * Add ability to filter workflows by workflow filename (in addition to the name)
 * Add ability to filter workflows by state
 * Add ability to perform a 'dry run' which logs the changes but doesn't perform the actual deletion.
@@ -48,7 +49,12 @@ The name or filename of the workflow. if not set then it will target all workflo
 #### Default: 'all'
 Remove workflow by state: active, deleted, disabled_fork, disabled_inactivity, disabled_manually
 
-### 7. `dry_run`
+### 7. `delete_workflow_by_conclusion_pattern`
+#### Required: NO
+#### Default: 'all'
+Remove workflow by conclusion: action_required, cancelled, failure, skipped, success 
+
+### 8. `dry_run`
 #### Required: NO
 Only log actions, do not perform any delete operations.
 ##
@@ -106,6 +112,18 @@ on:
           - deleted
           - disabled_inactivity
           - disabled_manually
+      delete_workflow_by_conclusion_pattern:
+        description: 'Remove workflow by conclusion: action_required, cancelled, failure, skipped, success'
+        required: true
+        default: "All"
+        type: choice
+        options:
+          - "All"
+          - action_required
+          - cancelled
+          - failure
+          - skipped
+          - success
       dry_run:
         description: 'Only log actions, do not perform any delete operations.'
         required: false
@@ -123,6 +141,7 @@ jobs:
           keep_minimum_runs: ${{ github.event.inputs.minimum_runs }}
           delete_workflow_pattern: ${{ github.event.inputs.delete_workflow_pattern }}
           delete_workflow_by_state_pattern: ${{ github.event.inputs.delete_workflow_by_state_pattern }}
+          delete_workflow_by_conclusion_pattern: ${{ github.event.inputs.delete_workflow_by_conclusion_pattern }}
           dry_run: ${{ github.event.inputs.dry_run }}
 ```
 ##

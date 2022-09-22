@@ -9,6 +9,7 @@ async function run() {
     const keep_minimum_runs = Number(core.getInput('keep_minimum_runs'));
     const delete_workflow_pattern = core.getInput('delete_workflow_pattern');
     const delete_workflow_by_state_pattern = core.getInput('delete_workflow_by_state_pattern');
+    const delete_workflow_by_conclusion_pattern = core.getInput('delete_workflow_by_conclusion_pattern');
     const dry_run = core.getInput('dry_run');
     // Split the input 'repository' (format {owner}/{repo}) to be {owner} and {repo}
     const splitRepository = repository.split('/');
@@ -39,6 +40,13 @@ async function run() {
       console.log(`💬 workflows containing state '${delete_workflow_by_state_pattern}' will be targeted`);
       workflows = workflows.filter(
         ({ state }) => state.indexOf(delete_workflow_by_state_pattern) !== -1
+      );
+    }
+
+    if (delete_workflow_by_conclusion_pattern && delete_workflow_by_conclusion_pattern.toLowerCase() !== "all") {
+      console.log(`💬 workflows containing conclusion '${delete_workflow_by_conclusion_pattern}' will be targeted`);
+      workflows = workflows.filter(
+          ({ conclusion }) => conclusion.indexOf(delete_workflow_by_conclusion_pattern) !== -1
       );
     }
 
