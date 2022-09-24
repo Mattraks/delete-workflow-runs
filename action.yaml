@@ -35,7 +35,7 @@ inputs:
     description: 'Remove workflow by state: active, deleted, disabled_fork, disabled_inactivity, disabled_manually'
     required: false
 
-  delete_workflow_by_conclusion_pattern:
+  delete_run_by_conclusion_pattern:
     description: 'Remove workflow by conclusion: action_required, cancelled, failure, skipped, success'
     required: false
 

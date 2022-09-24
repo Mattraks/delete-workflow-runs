@@ -9,7 +9,7 @@ async function run() {
     const keep_minimum_runs = Number(core.getInput('keep_minimum_runs'));
     const delete_workflow_pattern = core.getInput('delete_workflow_pattern');
     const delete_workflow_by_state_pattern = core.getInput('delete_workflow_by_state_pattern');
-    const delete_workflow_by_conclusion_pattern = core.getInput('delete_workflow_by_conclusion_pattern');
+    const delete_run_by_conclusion_pattern = core.getInput('delete_run_by_conclusion_pattern');
     const dry_run = core.getInput('dry_run');
     // Split the input 'repository' (format {owner}/{repo}) to be {owner} and {repo}
     const splitRepository = repository.split('/');
@@ -43,13 +43,6 @@ async function run() {
       );
     }
 
-    if (delete_workflow_by_conclusion_pattern && delete_workflow_by_conclusion_pattern.toLowerCase() !== "all") {
-      console.log(`💬 workflows containing conclusion '${delete_workflow_by_conclusion_pattern}' will be targeted`);
-      workflows = workflows.filter(
-          ({ conclusion }) => conclusion.indexOf(delete_workflow_by_conclusion_pattern) !== -1
-      );
-    }
-
     console.log(`💬 found total of ${workflows.length} workflow(s)`);
     for (const workflow of workflows) {
       core.debug(`Workflow: ${workflow.name} ${workflow.id} ${workflow.state}`);
@@ -66,6 +59,11 @@ async function run() {
         core.debug(`Run: '${workflow.name}' workflow run ${run.id} (status=${run.status})`)
         if (run.status !== "completed") {
           console.log(`👻 Skipped '${workflow.name}' workflow run ${run.id}: it is in '${run.status}' state`);
+          continue;
+        }
+        if (delete_run_by_conclusion_pattern && delete_run_by_conclusion_pattern.toLowerCase() !== "all"
+            && run.conclusion.indexOf(delete_run_by_conclusion_pattern) === -1  ) {
+          core.debug(`  Skipping '${workflow.name}' workflow run ${run.id} because conclusion was ${run.conclusion}`);
           continue;
         }
         const created_at = new Date(run.created_at);
