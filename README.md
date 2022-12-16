@@ -10,7 +10,7 @@ The action will calculate the number of days that each workflow run has been ret
 
 ## What's new?
 * Add the input parameter "[**`delete_run_by_conclusion_pattern`**](#7-delete_run_by_conclusion_pattern)" - useful for `skipped` workflow runs.
-* Add the input parameter "[**`delete_workflow_by_state_pattern`**](#6-delete_workflow_by_state_pattern)" and "[**`dry_run`**](#8-dry_run)". 
+* Add the input parameter "[**`delete_workflow_by_state_pattern`**](#6-delete_workflow_by_state_pattern)" and "[**`dry_run`**](#8-dry_run)".
 * Add ability to filter workflows by workflow filename (in addition to the name)
 * Add ability to filter workflows by state
 * Add ability to perform a 'dry run' which logs the changes but doesn't perform the actual deletion.
@@ -42,17 +42,17 @@ The minimum runs to keep for each workflow.
 ### 5. `delete_workflow_pattern`
 #### Required: NO
 #### Default: 'all'
-The name or filename of the workflow. if not set then it will target all workflows.
+The name or filename of the workflow. If not set then it will target all workflows.
 
 ### 6. `delete_workflow_by_state_pattern`
 #### Required: NO
 #### Default: 'all'
-Remove workflow by state: active, deleted, disabled_fork, disabled_inactivity, disabled_manually
+Remove workflow by state: active, deleted, disabled_fork, disabled_inactivity, disabled_manually.
 
 ### 7. `delete_run_by_conclusion_pattern`
 #### Required: NO
 #### Default: 'all'
-Remove workflow by conclusion: action_required, cancelled, failure, skipped, success 
+Remove workflow by conclusion: action_required, cancelled, failure, skipped, success.
 
 ### 8. `dry_run`
 #### Required: NO
