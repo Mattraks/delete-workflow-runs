@@ -21,7 +21,7 @@ The action will calculate the number of days that each workflow run has been ret
 #### Required: YES
 #### Default: `${{ github.token }}`
 The token used to authenticate.
-* If the workflow runs are in the current repository where the action is running, using **`github.token`** is OK. More details, see the [**`GITHUB_TOKEN`**](https://docs.github.com/en/free-pro-team@latest/actions/reference/authentication-in-a-workflow).
+* If the workflow runs are in the current repository where the action is running, using **`github.token`** is OK, but you must specify `permissions: actions: write` within your build job (or at a higher level) to allow the default token access to write (delete) action-related data. More details, see the [**`GITHUB_TOKEN`**](https://docs.github.com/en/free-pro-team@latest/actions/reference/authentication-in-a-workflow).
 * If the workflow runs are in another repository, you need to use a personal access token (PAT) that must have the **`repo`** scope. More details, see "[Creating a personal access token](https://docs.github.com/en/free-pro-team@latest/github/authenticating-to-github/creating-a-personal-access-token)".
 
 ### 2. `repository`
@@ -72,6 +72,8 @@ on:
 jobs:
   del_runs:
     runs-on: ubuntu-latest
+    permissions:
+      actions: write
     steps:
       - name: Delete workflow runs
         uses: Mattraks/delete-workflow-runs@v2
@@ -131,6 +133,8 @@ on:
 jobs:
   del_runs:
     runs-on: ubuntu-latest
+    permissions:
+      actions: write
     steps:
       - name: Delete workflow runs
         uses: Mattraks/delete-workflow-runs@v2
