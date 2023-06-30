@@ -43,6 +43,9 @@ inputs:
     description: 'Only log actions, do not perform any delete operations'
     required: false
 
+  check_branch_existence:
+    description: 'If the workflow was triggered by a branch, the branch must be deleted before the workflow run is deleted as well.'
+    required: false
 
 runs:
   using: 'node16'

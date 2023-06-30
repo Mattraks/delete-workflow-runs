@@ -59,6 +59,11 @@ Remove workflow by conclusion: action_required, cancelled, failure, skipped, suc
 Only log actions, do not perform any delete operations.
 ##
 
+### 9. `check_branch_existence`
+#### Required: NO
+If true, the removage of a workflow is skipped, when a run is attached to a existing branch. Set to true avoids that check runs are deleted and the checks are not more present.
+##
+
 ## Examples
 ### In scheduled workflow, see [schedule event](https://docs.github.com/en/free-pro-team@latest/actions/reference/events-that-trigger-workflows#schedule).
 > **Tip:** Using scheduled workflow is the recommended way that can periodically, automatically delete old workflow runs.

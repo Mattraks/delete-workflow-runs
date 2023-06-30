@@ -11,6 +11,7 @@ async function run() {
     const delete_workflow_by_state_pattern = core.getInput('delete_workflow_by_state_pattern');
     const delete_run_by_conclusion_pattern = core.getInput('delete_run_by_conclusion_pattern');
     const dry_run = core.getInput('dry_run');
+    const check_branch_existence = core.getInput("check_branch_existence")
     // Split the input 'repository' (format {owner}/{repo}) to be {owner} and {repo}
     const splitRepository = repository.split('/');
     if (splitRepository.length !== 2 || !splitRepository[0] || !splitRepository[1]) {
@@ -43,6 +44,14 @@ async function run() {
       );
     }
 
+    let branches = await octokit
+      .paginate("GET /repos/:owner/:repo/branches", {
+        owner: repo_owner,
+        repo: repo_name,
+      })
+
+    let branchNames = branches.map(a => a.name);
+
     console.log(`💬 found total of ${workflows.length} workflow(s)`);
     for (const workflow of workflows) {
       core.debug(`Workflow: ${workflow.name} ${workflow.id} ${workflow.state}`);
@@ -55,12 +64,20 @@ async function run() {
           repo: repo_name,
           workflow_id: workflow.id
         });
+
       for (const run of runs) {
         core.debug(`Run: '${workflow.name}' workflow run ${run.id} (status=${run.status})`)
+
         if (run.status !== "completed") {
           console.log(`👻 Skipped '${workflow.name}' workflow run ${run.id}: it is in '${run.status}' state`);
           continue;
         }
+
+        if (check_branch_existence && branchNames.indexOf(run.head_branch) === 1 ) {
+          console.log(` Skipping '${workflow.name}' workflow run ${run.id} because branch is still active.`);
+          continue;
+        }
+
         if (delete_run_by_conclusion_pattern && delete_run_by_conclusion_pattern.toLowerCase() !== "all"
             && run.conclusion.indexOf(delete_run_by_conclusion_pattern) === -1  ) {
           core.debug(`  Skipping '${workflow.name}' workflow run ${run.id} because conclusion was ${run.conclusion}`);
