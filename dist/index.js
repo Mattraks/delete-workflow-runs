@@ -12,6 +12,7 @@ async function run() {
     const delete_run_by_conclusion_pattern = core.getInput('delete_run_by_conclusion_pattern');
     const dry_run = core.getInput('dry_run');
     const check_branch_existence = core.getInput("check_branch_existence")
+    const check_pullrequest_exist = core.getInput("check_pullrequest_exist")
     // Split the input 'repository' (format {owner}/{repo}) to be {owner} and {repo}
     const splitRepository = repository.split('/');
     if (splitRepository.length !== 2 || !splitRepository[0] || !splitRepository[1]) {
@@ -70,6 +71,11 @@ async function run() {
 
         if (run.status !== "completed") {
           console.log(`👻 Skipped '${workflow.name}' workflow run ${run.id}: it is in '${run.status}' state`);
+          continue;
+        }
+ 
+        if (check_pullrequest_exist && run.pull_requests.length > 1) {
+          console.log(` Skipping '${workflow.name}' workflow run ${run.id} because PR is attached.`);
           continue;
         }
 

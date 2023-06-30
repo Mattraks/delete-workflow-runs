@@ -47,6 +47,10 @@ inputs:
     description: 'If the workflow was triggered by a branch, the branch must be deleted before the workflow run is deleted as well.'
     required: false
 
+  check_pullrequest_exist:
+    description: "If the run is linked to a pull request, the deletion is skipped."
+    required: false
+
 runs:
   using: 'node16'
   main: 'dist/index.js'

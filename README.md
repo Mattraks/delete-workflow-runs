@@ -61,8 +61,14 @@ Only log actions, do not perform any delete operations.
 
 ### 9. `check_branch_existence`
 #### Required: NO
-If true, the removage of a workflow is skipped, when a run is attached to a existing branch. Set to true avoids that check runs are deleted and the checks are not more present.
+If true, the removage of a workflow is skipped, when a run is attached to a existing branch. Set to true avoids that check runs are deleted and the checks are not more present. (excludes main)
 ##
+
+### 10. `check_pullrequest_exist`
+#### Required: NO
+If true, the Runs will be checked for linkage to a PR.
+##
+
 
 ## Examples
 ### In scheduled workflow, see [schedule event](https://docs.github.com/en/free-pro-team@latest/actions/reference/events-that-trigger-workflows#schedule).
