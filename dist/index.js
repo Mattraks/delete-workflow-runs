@@ -74,7 +74,7 @@ async function run() {
           continue;
         }
  
-        if (check_pullrequest_exist && run.pull_requests.length > 1) {
+        if (check_pullrequest_exist && run.pull_requests.length > 0) {
           console.log(` Skipping '${workflow.name}' workflow run ${run.id} because PR is attached.`);
           continue;
         }
