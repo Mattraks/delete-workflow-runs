@@ -26,37 +26,37 @@ The token used to authenticate.
 ### 2. `repository`
 #### Required: YES
 #### Default: `${{ github.repository }}`
-The name of the repository where the workflow runs are on.
+Name of the repository where the workflow runs are located
 
 ### 3. `retain_days`
 #### Required: YES
 #### Default: 30
-The number of days that is used to compare with the retention days of each workflow.
+Amount of days used to compare with the retention days of each workflow
 
 ### 4. `keep_minimum_runs`
 #### Required: YES
 #### Default: 6
-The minimum runs to keep for each workflow.
+Minimum runs to keep for each workflow
 
 ### 5. `delete_workflow_pattern`
 #### Required: NO
-The name or filename of the workflow. If not set then it will target all workflows.
+Name or filename of the workflow (if not set, all workflows are targeted)
 
 ### 6. `delete_workflow_by_state_pattern`
 #### Required: NO
 #### Default: 'ALL'
-Remove workflow by state: active, deleted, disabled_fork, disabled_inactivity, disabled_manually
+Filter workflows by state: active, deleted, disabled_fork, disabled_inactivity, disabled_manually  
 _Multiple state values permitted as a comma-separated list_
 
 ### 7. `delete_run_by_conclusion_pattern`
 #### Required: NO
 #### Default: 'ALL'
-Remove workflow by conclusion: action_required, cancelled, failure, skipped, success
+Remove runs based on conclusion: action_required, cancelled, failure, skipped, success  
 _Multiple conclusion values permitted as a comma-separated list_
 
 ### 8. `dry_run`
 #### Required: NO
-Only log actions, do not perform any delete operations.
+Logs simulated changes, no deletions are performed
 ##
 
 ## Examples
@@ -93,18 +93,18 @@ on:
   workflow_dispatch:
     inputs:
       days:
-        description: 'Number of days.'
+        description: 'Days-worth of runs to keep for each workflow'
         required: true
         default: '30'
       minimum_runs:
-        description: 'The minimum runs to keep for each workflow.'
+        description: 'Minimum runs to keep for each workflow'
         required: true
         default: '6'
       delete_workflow_pattern:
-        description: 'The name or filename of the workflow. if not set then it will target all workflows.'
+        description: 'Name or filename of the workflow (if not set, all workflows are targeted)'
         required: false
       delete_workflow_by_state_pattern:
-        description: 'Remove workflow by state: active, deleted, disabled_fork, disabled_inactivity, disabled_manually'
+        description: 'Filter workflows by state: active, deleted, disabled_fork, disabled_inactivity, disabled_manually'
         required: true
         default: "ALL"
         type: choice
@@ -115,7 +115,7 @@ on:
           - disabled_inactivity
           - disabled_manually
       delete_run_by_conclusion_pattern:
-        description: 'Remove workflow by conclusion: action_required, cancelled, failure, skipped, success'
+        description: 'Remove runs based on conclusion: action_required, cancelled, failure, skipped, success'
         required: true
         default: "ALL"
         type: choice
@@ -128,7 +128,7 @@ on:
           - skipped
           - success
       dry_run:
-        description: 'Only log actions, do not perform any delete operations.'
+        description: 'Logs simulated changes, no deletions are performed'
         required: false
 
 jobs:
