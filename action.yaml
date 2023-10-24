@@ -4,45 +4,45 @@ author: 'Mattraks'
 
 inputs:
   token:
-    description: 'The token used to authenticate.'
+    description: 'Authentication token'
     required: true
     default: ${{ github.token }}
 
   baseUrl:
-    description: 'The base api url to be used in enterprise github instances'
+    description: 'Base API URL'
     required: false
     default: "https://api.github.com"
+
   repository:
-    description: 'The name of the repository.'
+    description: 'Name of the repository'
     required: true
     default: ${{ github.repository }}
 
   retain_days:
-    description: 'The number of days.'
+    description: 'Days-worth of runs to keep for each workflow'
     required: true
     default: 30
 
   keep_minimum_runs:
-    description: 'The minimum runs to keep for each workflow.'
+    description: 'Minimum runs to keep for each workflow'
     required: true
     default: 6
 
   delete_workflow_pattern:
-    description: 'The name or filename of the workflow. if not set then it will target all workflows.'
+    description: 'Name or filename of the workflow (if not set, all workflows are targeted)'
     required: false
 
   delete_workflow_by_state_pattern:
-    description: 'Remove workflow by state: active, deleted, disabled_fork, disabled_inactivity, disabled_manually'
+    description: 'Filter workflows by state: active, deleted, disabled_fork, disabled_inactivity, disabled_manually'
     required: false
 
   delete_run_by_conclusion_pattern:
-    description: 'Remove workflow by conclusion: action_required, cancelled, failure, skipped, success'
+    description: 'Remove runs based on conclusion: action_required, cancelled, failure, skipped, success'
     required: false
 
   dry_run:
-    description: 'Only log actions, do not perform any delete operations'
+    description: 'Logs simulated changes, no deletions are performed'
     required: false
-
 
 runs:
   using: 'node16'
