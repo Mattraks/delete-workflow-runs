@@ -26,7 +26,7 @@ async function run() {
         repo: repo_name,
       });
 
-    if (delete_workflow_pattern && delete_workflow_pattern.toLowerCase() !== "all") {
+    if (delete_workflow_pattern && delete_workflow_pattern.toUpperCase() !== "ALL") {
       console.log(`💬 workflows containing '${delete_workflow_pattern}' will be targeted`);
       workflows = workflows.filter(
         ({ name, path }) => {
@@ -36,7 +36,7 @@ async function run() {
       );
     }
 
-    if (delete_workflow_by_state_pattern && delete_workflow_by_state_pattern.toLowerCase() !== "all") {
+    if (delete_workflow_by_state_pattern && delete_workflow_by_state_pattern.toUpperCase() !== "ALL") {
       console.log(`💬 workflows containing state '${delete_workflow_by_state_pattern}' will be targeted`);
       workflows = workflows.filter(
         ({ state }) => delete_workflow_by_state_pattern.split(",").map(x => x.trim()).includes(state)
@@ -63,7 +63,7 @@ async function run() {
         }
         if (delete_run_by_conclusion_pattern
             && delete_run_by_conclusion_pattern.split(",").map(x => x.trim()).includes(run.conclusion)
-            && delete_run_by_conclusion_pattern.toLowerCase() !== "all") {
+            && delete_run_by_conclusion_pattern.toUpperCase() !== "ALL") {
           core.debug(`  Skipping '${workflow.name}' workflow run ${run.id} because conclusion was ${run.conclusion}`);
           continue;
         }

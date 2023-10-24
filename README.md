@@ -41,18 +41,18 @@ The minimum runs to keep for each workflow.
 
 ### 5. `delete_workflow_pattern`
 #### Required: NO
-#### Default: 'all'
+#### Default: 'ALL'
 The name or filename of the workflow. If not set then it will target all workflows.
 
 ### 6. `delete_workflow_by_state_pattern`
 #### Required: NO
-#### Default: 'all'
+#### Default: 'ALL'
 Remove workflow by state: active, deleted, disabled_fork, disabled_inactivity, disabled_manually
 _Multiple state values permitted as a comma-separated list_
 
 ### 7. `delete_run_by_conclusion_pattern`
 #### Required: NO
-#### Default: 'all'
+#### Default: 'ALL'
 Remove workflow by conclusion: action_required, cancelled, failure, skipped, success
 _Multiple conclusion values permitted as a comma-separated list_
 
@@ -108,10 +108,10 @@ on:
       delete_workflow_by_state_pattern:
         description: 'Remove workflow by state: active, deleted, disabled_fork, disabled_inactivity, disabled_manually'
         required: true
-        default: "All"
+        default: "ALL"
         type: choice
         options:
-          - "All"
+          - "ALL"
           - active
           - deleted
           - disabled_inactivity
@@ -119,10 +119,10 @@ on:
       delete_run_by_conclusion_pattern:
         description: 'Remove workflow by conclusion: action_required, cancelled, failure, skipped, success'
         required: true
-        default: "All"
+        default: "ALL"
         type: choice
         options:
-          - "All"
+          - "ALL"
           - "Unsuccessful: action_required,cancelled,failure,skipped"
           - action_required
           - cancelled
