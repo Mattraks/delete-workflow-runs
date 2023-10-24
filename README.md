@@ -41,7 +41,6 @@ The minimum runs to keep for each workflow.
 
 ### 5. `delete_workflow_pattern`
 #### Required: NO
-#### Default: 'ALL'
 The name or filename of the workflow. If not set then it will target all workflows.
 
 ### 6. `delete_workflow_by_state_pattern`

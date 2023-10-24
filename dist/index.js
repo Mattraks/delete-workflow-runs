@@ -26,7 +26,7 @@ async function run() {
         repo: repo_name,
       });
 
-    if (delete_workflow_pattern && delete_workflow_pattern.toUpperCase() !== "ALL") {
+    if (delete_workflow_pattern) {
       console.log(`💬 workflows containing '${delete_workflow_pattern}' will be targeted`);
       workflows = workflows.filter(
         ({ name, path }) => {
