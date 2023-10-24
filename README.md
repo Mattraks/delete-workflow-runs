@@ -48,11 +48,13 @@ The name or filename of the workflow. If not set then it will target all workflo
 #### Required: NO
 #### Default: 'all'
 Remove workflow by state: active, deleted, disabled_fork, disabled_inactivity, disabled_manually
+_Multiple state values permitted as a comma-separated list_
 
 ### 7. `delete_run_by_conclusion_pattern`
 #### Required: NO
 #### Default: 'all'
 Remove workflow by conclusion: action_required, cancelled, failure, skipped, success
+_Multiple conclusion values permitted as a comma-separated list_
 
 ### 8. `dry_run`
 #### Required: NO
@@ -121,6 +123,7 @@ on:
         type: choice
         options:
           - "All"
+          - "Unsuccessful: action_required,cancelled,failure,skipped"
           - action_required
           - cancelled
           - failure
@@ -145,7 +148,12 @@ jobs:
           keep_minimum_runs: ${{ github.event.inputs.minimum_runs }}
           delete_workflow_pattern: ${{ github.event.inputs.delete_workflow_pattern }}
           delete_workflow_by_state_pattern: ${{ github.event.inputs.delete_workflow_by_state_pattern }}
-          delete_run_by_conclusion_pattern: ${{ github.event.inputs.delete_run_by_conclusion_pattern }}
+          delete_run_by_conclusion_pattern: >-
+            ${{
+              startsWith(github.event.inputs.delete_run_by_conclusion_pattern, 'Unsuccessful:')
+              && 'action_required,cancelled,failure,skipped'
+              || github.event.inputs.delete_run_by_conclusion_pattern
+            }}
           dry_run: ${{ github.event.inputs.dry_run }}
 ```
 ##
