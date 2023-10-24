@@ -9,6 +9,8 @@ The GitHub action to delete workflow runs in a repository. This action (written 
 The action will calculate the number of days that each workflow run has been retained so far, then use this number to compare with the number you specify for the input parameter "[**`retain_days`**](#3-retain_days)". If the retention days of the workflow run has reached (equal to or greater than) the specified number, the workflow run will be deleted.
 
 ## What's new?
+* Added ability to match multiple values with "[**`delete_workflow_by_state_pattern`**](#6-delete_workflow_by_state_pattern)" & "[**`delete_run_by_conclusion_pattern`**](#7-delete_run_by_conclusion_pattern)" by using a comma-separated list
+* Removed 'all' option from "[**`delete_workflow_pattern`**](#5-delete_workflow_pattern)", simply don't provide it a value for all workflows to be targeted
 * Added the input parameter "[**`delete_run_by_conclusion_pattern`**](#7-delete_run_by_conclusion_pattern)" - filters runs by conclusion (useful for `skipped`!)
 * Added the input parameter "[**`delete_workflow_by_state_pattern`**](#6-delete_workflow_by_state_pattern)" - filters workflows by state
 * Added the input parameter "[**`dry_run`**](#8-dry_run)" - only logs targeted workflows & runs, no deletions are performed
