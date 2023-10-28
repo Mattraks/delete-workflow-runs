@@ -9,11 +9,12 @@ The GitHub action to delete workflow runs in a repository. This action (written 
 The action will calculate the number of days that each workflow run has been retained so far, then use this number to compare with the number you specify for the input parameter "[**`retain_days`**](#3-retain_days)". If the retention days of the workflow run has reached (equal to or greater than) the specified number, the workflow run will be deleted.
 
 ## What's new?
-* Add the input parameter "[**`delete_run_by_conclusion_pattern`**](#7-delete_run_by_conclusion_pattern)" - useful for `skipped` workflow runs.
-* Add the input parameter "[**`delete_workflow_by_state_pattern`**](#6-delete_workflow_by_state_pattern)" and "[**`dry_run`**](#8-dry_run)".
-* Add ability to filter workflows by workflow filename (in addition to the name)
-* Add ability to filter workflows by state
-* Add ability to perform a 'dry run' which logs the changes but doesn't perform the actual deletion.
+* Added ability to match multiple values with "[**`delete_workflow_by_state_pattern`**](#6-delete_workflow_by_state_pattern)" & "[**`delete_run_by_conclusion_pattern`**](#7-delete_run_by_conclusion_pattern)" by using a comma-separated list
+* Removed 'all' option from "[**`delete_workflow_pattern`**](#5-delete_workflow_pattern)", simply don't provide it a value for all workflows to be targeted
+* Added the input parameter "[**`delete_run_by_conclusion_pattern`**](#7-delete_run_by_conclusion_pattern)" - filters runs by conclusion (useful for `skipped`!)
+* Added the input parameter "[**`delete_workflow_by_state_pattern`**](#6-delete_workflow_by_state_pattern)" - filters workflows by state
+* Added the input parameter "[**`dry_run`**](#8-dry_run)" - only logs targeted workflows & runs, no deletions are performed
+* Added ability to filter workflows by workflow filename (in addition to the name)
 ##
 
 ## Inputs
@@ -27,36 +28,37 @@ The token used to authenticate.
 ### 2. `repository`
 #### Required: YES
 #### Default: `${{ github.repository }}`
-The name of the repository where the workflow runs are on.
+Name of the repository where the workflow runs are located
 
 ### 3. `retain_days`
 #### Required: YES
 #### Default: 30
-The number of days that is used to compare with the retention days of each workflow.
+Amount of days used to compare with the retention days of each workflow
 
 ### 4. `keep_minimum_runs`
 #### Required: YES
 #### Default: 6
-The minimum runs to keep for each workflow.
+Minimum runs to keep for each workflow
 
 ### 5. `delete_workflow_pattern`
 #### Required: NO
-#### Default: 'all'
-The name or filename of the workflow. If not set then it will target all workflows.
+Name or filename of the workflow (if not set, all workflows are targeted)
 
 ### 6. `delete_workflow_by_state_pattern`
 #### Required: NO
-#### Default: 'all'
-Remove workflow by state: active, deleted, disabled_fork, disabled_inactivity, disabled_manually
+#### Default: 'ALL'
+Filter workflows by state: active, deleted, disabled_fork, disabled_inactivity, disabled_manually  
+_Multiple state values permitted as a comma-separated list_
 
 ### 7. `delete_run_by_conclusion_pattern`
 #### Required: NO
-#### Default: 'all'
-Remove workflow by conclusion: action_required, cancelled, failure, skipped, success
+#### Default: 'ALL'
+Remove runs based on conclusion: action_required, cancelled, failure, skipped, success  
+_Multiple conclusion values permitted as a comma-separated list_
 
 ### 8. `dry_run`
 #### Required: NO
-Only log actions, do not perform any delete operations.
+Logs simulated changes, no deletions are performed
 ##
 
 ### 9. `check_branch_existence`
@@ -104,41 +106,42 @@ on:
   workflow_dispatch:
     inputs:
       days:
-        description: 'Number of days.'
+        description: 'Days-worth of runs to keep for each workflow'
         required: true
-        default: 30
+        default: '30'
       minimum_runs:
-        description: 'The minimum runs to keep for each workflow.'
+        description: 'Minimum runs to keep for each workflow'
         required: true
-        default: 6
+        default: '6'
       delete_workflow_pattern:
-        description: 'The name or filename of the workflow. if not set then it will target all workflows.'
+        description: 'Name or filename of the workflow (if not set, all workflows are targeted)'
         required: false
       delete_workflow_by_state_pattern:
-        description: 'Remove workflow by state: active, deleted, disabled_fork, disabled_inactivity, disabled_manually'
+        description: 'Filter workflows by state: active, deleted, disabled_fork, disabled_inactivity, disabled_manually'
         required: true
-        default: "All"
+        default: "ALL"
         type: choice
         options:
-          - "All"
+          - "ALL"
           - active
           - deleted
           - disabled_inactivity
           - disabled_manually
       delete_run_by_conclusion_pattern:
-        description: 'Remove workflow by conclusion: action_required, cancelled, failure, skipped, success'
+        description: 'Remove runs based on conclusion: action_required, cancelled, failure, skipped, success'
         required: true
-        default: "All"
+        default: "ALL"
         type: choice
         options:
-          - "All"
+          - "ALL"
+          - "Unsuccessful: action_required,cancelled,failure,skipped"
           - action_required
           - cancelled
           - failure
           - skipped
           - success
       dry_run:
-        description: 'Only log actions, do not perform any delete operations.'
+        description: 'Logs simulated changes, no deletions are performed'
         required: false
 
 jobs:
@@ -156,7 +159,12 @@ jobs:
           keep_minimum_runs: ${{ github.event.inputs.minimum_runs }}
           delete_workflow_pattern: ${{ github.event.inputs.delete_workflow_pattern }}
           delete_workflow_by_state_pattern: ${{ github.event.inputs.delete_workflow_by_state_pattern }}
-          delete_run_by_conclusion_pattern: ${{ github.event.inputs.delete_run_by_conclusion_pattern }}
+          delete_run_by_conclusion_pattern: >-
+            ${{
+              startsWith(github.event.inputs.delete_run_by_conclusion_pattern, 'Unsuccessful:')
+              && 'action_required,cancelled,failure,skipped'
+              || github.event.inputs.delete_run_by_conclusion_pattern
+            }}
           dry_run: ${{ github.event.inputs.dry_run }}
 ```
 ##
