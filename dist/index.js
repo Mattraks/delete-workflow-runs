@@ -85,7 +85,7 @@ async function run() {
         }
 
         if (delete_run_by_conclusion_pattern
-            && delete_run_by_conclusion_pattern.split(",").map(x => x.trim()).includes(run.conclusion)
+            && !delete_run_by_conclusion_pattern.split(",").map(x => x.trim()).includes(run.conclusion)
             && delete_run_by_conclusion_pattern.toUpperCase() !== "ALL") {
           core.debug(`  Skipping '${workflow.name}' workflow run ${run.id} because conclusion was ${run.conclusion}`);
           continue;
