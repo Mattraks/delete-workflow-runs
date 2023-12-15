@@ -21,7 +21,31 @@ async function run() {
     const repo_owner = splitRepository[0];
     const repo_name = splitRepository[1];
     const { Octokit } = require("@octokit/rest");
-    const octokit = new Octokit({ auth: token, baseUrl: url });
+    const { throttling } = require("@octokit/plugin-throttling");
+    const MyOctokit = Octokit.plugin(throttling);
+    const octokit = new MyOctokit({
+      auth: token, 
+      baseUrl: url,
+      // To avoid "API rate limit exceeded" errors
+      throttle: {
+        onRateLimit: (retryAfter, options, octokit, retryCount) => {
+          octokit.log.warn(
+            `Request quota exhausted for request ${options.method} ${options.url}`,
+          );
+          if (retryCount < 1) {
+            // only retries once
+            octokit.log.info(`Retrying after ${retryAfter} seconds!`);
+            return true;
+          }
+        },
+        onSecondaryRateLimit: (retryAfter, options, octokit) => {
+          // does not retry, only logs a warning
+          octokit.log.warn(
+            `SecondaryRateLimit detected for request ${options.method} ${options.url}`,
+          );
+        },
+      },
+    });    
     let workflows = await octokit
       .paginate("GET /repos/:owner/:repo/actions/workflows", {
         owner: repo_owner,
