@@ -24,7 +24,7 @@ async function run() {
     const { throttling } = require("@octokit/plugin-throttling");
     const MyOctokit = Octokit.plugin(throttling);
     const octokit = new MyOctokit({
-      auth: token, 
+      auth: token,
       baseUrl: url,
       // To avoid "API rate limit exceeded" errors
       throttle: {
@@ -45,12 +45,48 @@ async function run() {
           );
         },
       },
-    });    
+    });
     let workflows = await octokit
       .paginate("GET /repos/:owner/:repo/actions/workflows", {
         owner: repo_owner,
         repo: repo_name,
       });
+
+    let workflow_ids = workflows.map(w => w.id);
+
+    // Gets all workflow runs for the repository
+    // see https://docs.github.com/en/rest/actions/workflow-runs?apiVersion=2022-11-28#list-workflow-runs-for-a-repository
+    let all_runs = await octokit
+      .paginate('GET /repos/:owner/:repo/actions/runs', {
+        owner: repo_owner,
+        repo: repo_name,
+      });
+
+    // Creates the delete runs array, and adds the runs that don't have a workflow associated with it
+    let del_runs = new Array();
+    del_runs = all_runs.filter(
+      ({ workflow_id }) => {
+        return workflow_ids.some(w => w === workflow_id);
+      }
+    );
+
+    for (const del of del_runs) {
+      core.debug(`Deleting '${del.name}' workflow run ${del.id}`);
+      // Execute the API "Delete a workflow run", see 'https://octokit.github.io/rest.js/v18#actions-delete-workflow-run'
+
+      if (dry_run) {
+        console.log(`[dry-run] 🚀 Delete run ${del.id} of '${del.name}' workflow`);
+        continue;
+      }
+
+      await octokit.actions.deleteWorkflowRun({
+        owner: repo_owner,
+        repo: repo_name,
+        run_id: del.id
+      });
+
+      console.log(`🚀 Delete run ${del.id} of '${del.name}' workflow`);
+    }
 
     if (delete_workflow_pattern) {
       console.log(`💬 workflows containing '${delete_workflow_pattern}' will be targeted`);
@@ -97,20 +133,20 @@ async function run() {
           console.log(`👻 Skipped '${workflow.name}' workflow run ${run.id}: it is in '${run.status}' state`);
           continue;
         }
- 
+
         if (check_pullrequest_exist && run.pull_requests.length > 0) {
           console.log(` Skipping '${workflow.name}' workflow run ${run.id} because PR is attached.`);
           continue;
         }
 
-        if (check_branch_existence && branchNames.indexOf(run.head_branch) === 1 ) {
+        if (check_branch_existence && branchNames.indexOf(run.head_branch) === 1) {
           console.log(` Skipping '${workflow.name}' workflow run ${run.id} because branch is still active.`);
           continue;
         }
 
         if (delete_run_by_conclusion_pattern
-            && !delete_run_by_conclusion_pattern.split(",").map(x => x.trim()).includes(run.conclusion)
-            && delete_run_by_conclusion_pattern.toUpperCase() !== "ALL") {
+          && !delete_run_by_conclusion_pattern.split(",").map(x => x.trim()).includes(run.conclusion)
+          && delete_run_by_conclusion_pattern.toUpperCase() !== "ALL") {
           core.debug(`  Skipping '${workflow.name}' workflow run ${run.id} because conclusion was ${run.conclusion}`);
           continue;
         }
