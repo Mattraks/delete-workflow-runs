@@ -64,12 +64,15 @@ async function run() {
 
     // Creates the delete runs array, and adds the runs that don't have a workflow associated with it
     let del_runs = new Array();
-    del_runs = all_runs.filter(
-      ({ workflow_id }) => {
-        return workflow_ids.some(w => w === workflow_id);
+    for (const run of all_runs) {
+      if (!workflow_ids.includes(run.workflow_id)) {
+        del_runs.push(run);
+        core.debug(`  Added to del list '${run.name}' workflow run ${run.id}`);
       }
-    );
+    }
 
+    console.log(`💬 found total of ${del_runs.length} workflow run(s)`);
+    // is attempting to delete the existing workflow. Means the filtering logic is wrong
     for (const del of del_runs) {
       core.debug(`Deleting '${del.name}' workflow run ${del.id}`);
       // Execute the API "Delete a workflow run", see 'https://octokit.github.io/rest.js/v18#actions-delete-workflow-run'
