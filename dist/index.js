@@ -6,7 +6,7 @@ async function run() {
     const url = core.getInput("baseUrl");
     const repositoryToRun = core.getInput("repository");
     let repositoryArray = core.getInput("repository_array");
-    // console.log(repositoryArray);
+    console.log(repositoryToRun);
     // throw "stop";
     const retain_days = Number(core.getInput("retain_days"));
     const keep_minimum_runs = Number(core.getInput("keep_minimum_runs"));
