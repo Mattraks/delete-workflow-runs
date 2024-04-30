@@ -5,9 +5,7 @@ async function run() {
     const token = core.getInput("token");
     const url = core.getInput("baseUrl");
     const repositoryToRun = core.getInput("repository");
-    let repositoryArray = core.getInput("repository_array");
-    console.log(repositoryToRun);
-    // throw "stop";
+    let repositoryArray = JSON.parse(core.getInput("repository_array"));
     const retain_days = Number(core.getInput("retain_days"));
     const keep_minimum_runs = Number(core.getInput("keep_minimum_runs"));
     const delete_workflow_pattern = core.getInput("delete_workflow_pattern");

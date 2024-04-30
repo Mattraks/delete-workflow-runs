@@ -16,12 +16,10 @@ inputs:
   repository:
     description: "Name of the repository"
     required: false
-    default: ${{ github.repository }}
 
   repository_array:
     description: "The name of the repository."
     required: false
-    default: ${{ github.repository_array }}
 
   retain_days:
     description: "Days-worth of runs to keep for each workflow"
