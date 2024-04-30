@@ -5,7 +5,7 @@ async function run() {
     const token = core.getInput("token");
     const url = core.getInput("baseUrl");
     const repositoryToRun = core.getInput("repository");
-    let repositoryArray = core.getInput("repository_array");
+    let repositoryArray = JSON.parse(core.getInput("repository_array"));
     console.log(typeof repositoryArray);
     console.log(repositoryArray[0]);
     // throw "stop";
