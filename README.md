@@ -26,47 +26,52 @@ The token used to authenticate.
 * If the workflow runs are in another repository, you need to use a personal access token (PAT) that must have the **`repo`** scope. More details, see "[Creating a personal access token](https://docs.github.com/en/free-pro-team@latest/github/authenticating-to-github/creating-a-personal-access-token)".
 
 ### 2. `repository`
-#### Required: YES
-#### Default: `${{ github.repository }}`
+#### Required: NO
 Name of the repository where the workflow runs are located
 
-### 3. `retain_days`
+### 3. `repository_array`
+#### Required: NO
+Array of repositories where the workflow runs are located. This expects a JSON array.
+
+### NOTE: Must use either `repository` or `repository_array`
+
+### 4. `retain_days`
 #### Required: YES
 #### Default: 30
 Amount of days used to compare with the retention days of each workflow
 
-### 4. `keep_minimum_runs`
+### 5. `keep_minimum_runs`
 #### Required: YES
 #### Default: 6
 Minimum runs to keep for each workflow
 
-### 5. `delete_workflow_pattern`
+### 6. `delete_workflow_pattern`
 #### Required: NO
 Name or filename of the workflow (if not set, all workflows are targeted)
 
-### 6. `delete_workflow_by_state_pattern`
+### 7. `delete_workflow_by_state_pattern`
 #### Required: NO
 #### Default: 'ALL'
 Filter workflows by state: active, deleted, disabled_fork, disabled_inactivity, disabled_manually  
 _Multiple state values permitted as a comma-separated list_
 
-### 7. `delete_run_by_conclusion_pattern`
+### 8. `delete_run_by_conclusion_pattern`
 #### Required: NO
 #### Default: 'ALL'
 Remove runs based on conclusion: action_required, cancelled, failure, skipped, success  
 _Multiple conclusion values permitted as a comma-separated list_
 
-### 8. `dry_run`
+### 9. `dry_run`
 #### Required: NO
 Logs simulated changes, no deletions are performed
 ##
 
-### 9. `check_branch_existence`
+### 10. `check_branch_existence`
 #### Required: NO
 If true, the removage of a workflow is skipped, when a run is attached to a existing branch. Set to true avoids that check runs are deleted and the checks are not more present. (excludes main)
 ##
 
-### 10. `check_pullrequest_exist`
+### 11. `check_pullrequest_exist`
 #### Required: NO
 If true, the Runs will be checked for linkage to a PR.
 ##
@@ -94,6 +99,34 @@ jobs:
         with:
           token: ${{ github.token }}
           repository: ${{ github.repository }}
+          retain_days: 30
+          keep_minimum_runs: 6
+```
+
+### Passing in an array of repos
+```yaml
+name: Delete old workflow runs for all repos in org
+on:
+  schedule:
+    - cron: '0 0 1 * *'
+# Run monthly, at 00:00 on the 1st day of month.
+
+jobs:
+  del_runs:
+    runs-on: ubuntu-latest
+    permissions:
+      actions: write
+      contents: read
+    steps:
+      - name: Get Accounts List
+        id: generate-repoList
+        run: |
+          echo "repoList=$(gh repo list yourOrgName --json nameWithOwner --jq '[.[].nameWithOwner]')" >> $GITHUB_OUTPUT
+      - name: Delete workflow runs
+        uses: 1uphealth/delete-workflow-runs-multi-repo-action
+        with:
+          token: ${{ github.token }}
+          repository_array: ${{ steps.generate-repoList.outputs.repoList }}
           retain_days: 30
           keep_minimum_runs: 6
 ```
