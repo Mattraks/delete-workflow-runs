@@ -63,7 +63,7 @@ Logs simulated changes, no deletions are performed
 
 ### 9. `check_branch_existence`
 #### Required: NO
-If true, the removage of a workflow is skipped, when a run is attached to a existing branch. Set to true avoids that check runs are deleted and the checks are not more present. (excludes main)
+If true, the removal of a workflow is skipped, when a run is attached to an existing branch. Set to true avoids that check runs are deleted and the checks are no longer present. (excludes main)
 ##
 
 ### 10. `check_pullrequest_exist`
