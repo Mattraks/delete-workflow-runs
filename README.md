@@ -169,6 +169,28 @@ jobs:
             }}
           dry_run: ${{ github.event.inputs.dry_run }}
 ```
+
+### Using with self-hosted git hub enterprise
+
+If you're using this action in a GHE environment, the value you provide for `baseUrl` needs to be the precise and full URL.
+Consult the [documentation](https://docs.github.com/en/enterprise-server@3.14/rest/quickstart?apiVersion=2022-11-28) for your GHE instance to determine the correct URL to use.
+
+For this example, let's say that you're running a modern version of GHE and it is accessible at `https://github.mycompany.com`.
+The API endpoint for your GHE instance will (probably) be `https://github.mycompany.com/api/v3`.
+So the resulting configuration would look like this:
+
+```yaml
+jobs:
+    clean_up:
+        # <...>
+        steps:
+            - name: Delete workflow runs
+              uses: Mattraks/delete-workflow-runs@v2
+              with:
+                  # <...>
+                  baseUrl: https://github.mycompany.com/api/v3
+```
+
 ##
 
 ## License
