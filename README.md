@@ -181,15 +181,42 @@ So the resulting configuration would look like this:
 
 ```yaml
 jobs:
-    clean_up:
-        # <...>
-        steps:
-            - name: Delete workflow runs
-              uses: Mattraks/delete-workflow-runs@v2
-              with:
-                  # <...>
-                  baseUrl: https://github.mycompany.com/api/v3
+  clean_up:
+    # <...>
+    steps:
+      - name: Delete workflow runs
+        uses: Mattraks/delete-workflow-runs@v2
+        with:
+          # <...>
+          baseUrl: https://github.mycompany.com/api/v3
 ```
+
+You can dynamically set baseUrl using the `${{ github.server_url }}` context instead of hardcoding the GHES URL. This ensures the action works across different GHE instances.
+
+Additionally, if you're using [Automatic Token Authentication](https://docs.github.com/en/enterprise-server/actions/security-for-github-actions/security-guides/automatic-token-authentication) in a GHES environment, you need to set the following permissions: `actions: write` and `contents: read`
+
+```yaml
+jobs:
+  clean_up:
+    # In GitHub Enterprise, if you encounter 'Resource not accessible by integration' error,
+    # you need to grant 'actions: write' and 'contents: read' permissions in cleanup step
+    permissions:
+      actions: write
+      contents: read
+    steps:
+      - name: Delete workflow runs
+        uses: Mattraks/delete-workflow-runs@v2
+        with:
+          # Auto-generated token during workflow execution
+          token: ${{ secrets.GITHUB_TOKEN }}
+          repository: ${{ github.repository }}
+          retain_days: 14
+          keep_minimum_runs: 6
+          # API endpoint for GitHub Enterprise
+          baseUrl: ${{ github.server_url }}/api/v3
+```
+
+This approach eliminates the need to manage a real-human's Personal Access Token (PAT) for authentication, making it more secure and easier to maintain.
 
 ##
 
