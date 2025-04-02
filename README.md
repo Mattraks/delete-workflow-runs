@@ -40,33 +40,56 @@ Amount of days used to compare with the retention days of each workflow
 #### Default: 6
 Minimum runs to keep for each workflow
 
-### 5. `delete_workflow_pattern`
+### 5. `branch_specific_minimum_runs`
 #### Required: NO
-Name or filename of the workflow (if not set, all workflows are targeted)
+#### Default: false
+When set, all workflows are grouped by branch and `keep_mininum_runs` will be applied to each group individually.
 
-### 6. `delete_workflow_by_state_pattern`
+### 6. `delete_workflow_pattern`
+#### Required: NO
+Name or filename of the workflow (if not set, all workflows are targeted).  
+_Multiple values permitted as a comma-separated list, but names used should not contain comma_
+
+### 7. `delete_workflow_by_state_pattern`
 #### Required: NO
 #### Default: 'ALL'
 Filter workflows by state: active, deleted, disabled_fork, disabled_inactivity, disabled_manually  
 _Multiple state values permitted as a comma-separated list_
 
-### 7. `delete_run_by_conclusion_pattern`
+### 8. `delete_run_by_conclusion_pattern`
 #### Required: NO
 #### Default: 'ALL'
 Remove runs based on conclusion: action_required, cancelled, failure, skipped, success  
 _Multiple conclusion values permitted as a comma-separated list_
 
-### 8. `dry_run`
+### 9. `branch_filter`
+#### Required: NO
+#### Default: '[".*"]'
+This allows the action to only target workflow runs triggered by specific branches.
+
+Expected value is a JSON array of regular expressions, e.g:  
+`'["main", "release/.*", "test/.*"]'` - only workflows whose branch names match `main`, `release/...` or `test/...` will be deleted (if no other filters prevent it).
+
+### 10. `dry_run`
 #### Required: NO
 Logs simulated changes, no deletions are performed
 ##
 
-### 9. `check_branch_existence`
+### 11. `check_branch_existence`
 #### Required: NO
 If true, the removage of a workflow is skipped, when a run is attached to a existing branch. Set to true avoids that check runs are deleted and the checks are not more present. (excludes main)
+
+### 12. `check_branch_existence_exceptions`
+#### Required: NO
+#### Default: main
+Only applies when `check_branch_existence=true`.  
+The branch name(s) listed here will be exempt from the existence check. Workflows from matching branches will not be checked for existence.
+This is useful to keep the history of permanent branches tidy while still preventing temporary branches from losing all their checks.  
+_Multiple names are permitted as a comma-separated list. Contrary to branch_filter, this does not use pattern matching._
+
 ##
 
-### 10. `check_pullrequest_exist`
+### 13. `check_pullrequest_exist`
 #### Required: NO
 If true, the Runs will be checked for linkage to a PR.
 ##

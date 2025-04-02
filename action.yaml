@@ -28,8 +28,15 @@ inputs:
     required: true
     default: 6
 
+  branch_specific_minimum_runs:
+    description: 'When true, the number of minimum runs is counted per branch instead of overall'
+    required: false
+    default: false
+
   delete_workflow_pattern:
-    description: 'Name or filename of the workflow (if not set, all workflows are targeted)'
+    description: |
+      Name or filename of the workflow (if not set, all workflows are targeted). Can also be a comma-separated list of file names.
+      If workflow names are used instead of file names, they should not contain commas.
     required: false
 
   delete_workflow_by_state_pattern:
@@ -44,9 +51,21 @@ inputs:
     description: 'Logs simulated changes, no deletions are performed'
     required: false
 
+  branch_filter:
+    description: |
+      Json-String containing array of 1-n branch name (regex). When active, only workflow runs triggered by a matching branch will be considered.
+      Works best with 'branch_specific_minimum_runs:true'
+    required: false
+    default: '[".*"]'
+    
   check_branch_existence:
     description: 'If the workflow was triggered by a branch, the branch must be deleted before the workflow run is deleted as well.'
     required: false
+
+  check_branch_existence_exceptions:
+    description: 'Comma separated list of branch names that shall be ignored for "check_branch_existence". These branches will have their workflows deleted, even when they still exist.'
+    required: false
+    default: main
 
   check_pullrequest_exist:
     description: "If the run is linked to a pull request, the deletion is skipped."
