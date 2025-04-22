@@ -62,16 +62,13 @@ async function run() {
         repo: repo_name,
       });
 
-    // Creates the delete runs array, and adds the runs that don't have a workflow associated with it
     let del_runs = new Array();
     for (const run of all_runs) {
-      if (!workflow_ids.includes(run.workflow_id)) {
+      // Creates the delete runs array, and adds the runs that don't have a workflow associated with it
+      // if (!workflow_ids.includes(run.workflow_id)) { -> Deleted this condition. It doesn't make sense.
         del_runs.push(run);
         core.debug(`  Added to del list '${run.name}' workflow run ${run.id}`);
-      }
-      else {
-        core.debug(`  Skipped '${run.name}' workflow run ${run.id}`);
-      }    
+      // }
     }
 
     console.log(`💬 found total of ${del_runs.length} workflow run(s)`);
