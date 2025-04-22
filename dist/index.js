@@ -52,10 +52,6 @@ async function run() {
         repo: repo_name,
       });
 
-    if (dry_run) {
-        console.log('[dry-run] Workflows', workflows);
-    }
-
     let workflow_ids = workflows.map(w => w.id);
 
     // Gets all workflow runs for the repository
@@ -73,6 +69,9 @@ async function run() {
         del_runs.push(run);
         core.debug(`  Added to del list '${run.name}' workflow run ${run.id}`);
       }
+      else {
+        core.debug(`  Skipped '${run.name}' workflow run ${run.id}`);
+      }    
     }
 
     console.log(`💬 found total of ${del_runs.length} workflow run(s)`);
