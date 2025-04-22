@@ -52,6 +52,10 @@ async function run() {
         repo: repo_name,
       });
 
+    if (dry_run) {
+        console.log('[dry-run] Workflows', workflows);
+    }
+
     let workflow_ids = workflows.map(w => w.id);
 
     // Gets all workflow runs for the repository
