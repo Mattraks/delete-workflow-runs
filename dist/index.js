@@ -82,11 +82,16 @@ async function run() {
         continue;
       }
 
-      await octokit.actions.deleteWorkflowRun({
-        owner: repo_owner,
-        repo: repo_name,
-        run_id: del.id
-      });
+      try {
+        await octokit.actions.deleteWorkflowRun({
+          owner: repo_owner,
+          repo: repo_name,
+          run_id: del.id
+        });
+      }
+      catch (error) {
+        core.setFailed(error.message);
+      }
 
       console.log(`🚀 Delete run ${del.id} of '${del.name}' workflow`);
     }
