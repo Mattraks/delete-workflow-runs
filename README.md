@@ -12,19 +12,19 @@ A GitHub Action to delete workflow runs in a repository. This Action uses JavaSc
 
 ## Inputs (summary)
 
-| Input | Required | Default | Description |
-|---|---:|---|---|
-| `token` | No | `${{github.token}}` | GitHub token used for authentication. Use `github.token` for the current repository or a PAT with `repo` scope for cross-repo access. Token must have appropriate permissions (see Permissions). |
-| `repository` | No | `${{github.repository}}` | The target repository in `owner/repo` format. |
-| `retain_days` | No | `30` | Number of days to retain workflow runs before deletion. |
-| `keep_minimum_runs` | No | `6` | Minimum number of runs to keep per workflow. |
-| `delete_workflow_pattern` | No | (empty) | Target workflows by name or filename. Supports multiple filters separated by `\|`. Example: `build\|deploy` will match workflows with "build" OR "deploy" in name/filename. Omit to target all workflows. |
-| `delete_workflow_by_state_pattern` | No | (empty) | Filter workflows by state (comma-separated): `active`, `deleted`, `disabled_fork`, `disabled_inactivity`, `disabled_manually`. Omit to target all states. |
-| `delete_run_by_conclusion_pattern` | No | (empty) | Filter runs by conclusion (comma-separated): `action_required`, `cancelled`, `failure`, `skipped`, `success`. Omit to target all conclusions. |
-| `dry_run` | No | `false` | If `true`, simulate deletions and only log actions without performing them. |
-| `check_branch_existence` | No | `false` | If `true`, skip deletion for runs linked to an existing branch. Note: default branch (e.g., `main`) can be excluded from deletion checks as configured. |
-| `check_pullrequest_exist` | No | `false` | If `true`, skip deletion for runs linked to a pull request. |
-| `baseUrl` | No | (GitHub API base) | Optional GitHub Enterprise API base URL (e.g. `https://github.mycompany.com/api/v3`). Set when using GitHub Enterprise / GHES. |
+| Input | Default | Description |
+|---|---|---|
+| `token` | `${{github.token}}` | GitHub token used for authentication. Use `github.token` for the current repository or a PAT with `repo` scope for cross-repo access. Token must have appropriate permissions (see Permissions). |
+| `repository` | `${{github.repository}}` | The target repository in `owner/repo` format. |
+| `retain_days` | `30` | Number of days to retain workflow runs before deletion. |
+| `keep_minimum_runs` | `6` | Minimum number of runs to keep per workflow. |
+| `delete_workflow_pattern` | (empty) | Target workflows by name or filename. Supports multiple filters separated by `\|`. Example: `build\|deploy` will match workflows with "build" OR "deploy" in name/filename. Omit to target all workflows. |
+| `delete_workflow_by_state_pattern` | (empty) | Filter workflows by state (comma-separated): `active`, `deleted`, `disabled_fork`, `disabled_inactivity`, `disabled_manually`. Omit to target all states. |
+| `delete_run_by_conclusion_pattern` | (empty) | Filter runs by conclusion (comma-separated): `action_required`, `cancelled`, `failure`, `skipped`, `success`. Omit to target all conclusions. |
+| `dry_run` | `false` | If `true`, simulate deletions and only log actions without performing them. |
+| `check_branch_existence` | `false` | If `true`, skip deletion for runs linked to an existing branch. Note: default branch (e.g., `main`) can be excluded from deletion checks as configured. |
+| `check_pullrequest_exist` | `false` | If `true`, skip deletion for runs linked to a pull request. |
+| `baseUrl` | (GitHub API base) | Optional GitHub Enterprise API base URL (e.g. `https://github.mycompany.com/api/v3`). Set when using GitHub Enterprise / GHES. |
 
 Notes:
 - Inputs names reflect the action's expected input keys. Do not change names in your workflow unless you have updated the Action code accordingly.
@@ -84,18 +84,14 @@ on:
     inputs:
       days:
         description: "Days to retain runs"
-        required: true
         default: "30"
       minimum_runs:
         description: "Minimum runs to keep"
-        required: true
         default: "6"
       delete_workflow_pattern:
         description: "Workflow name or filename (omit for all). Use `|` to separate multiple filters (e.g. 'build|deploy')."
-        required: false
       delete_workflow_by_state_pattern:
         description: "Workflow state: active, deleted, disabled_fork, disabled_inactivity, disabled_manually"
-        required: false
         default: "ALL"
         type: choice
         options:
@@ -106,7 +102,6 @@ on:
           - disabled_manually
       delete_run_by_conclusion_pattern:
         description: "Run conclusion: action_required, cancelled, failure, skipped, success"
-        required: false
         default: "ALL"
         type: choice
         options:
@@ -119,7 +114,6 @@ on:
           - success
       dry_run:
         description: "Simulate deletions"
-        required: false
         default: "false"
         type: choice
         options:
@@ -161,11 +155,9 @@ on:
     inputs:
       days:
         description: "Days to retain runs"
-        required: true
         default: "30"
       minimum_runs:
         description: "Minimum runs to keep"
-        required: true
         default: "6"
 jobs:
   delete-multiple-repos:

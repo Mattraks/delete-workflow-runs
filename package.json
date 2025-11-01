@@ -12,7 +12,7 @@
     "build": "ncc build index.js -o dist --minify",
     "test": "jest",
     "lint": "eslint . --ext .js --no-config-lookup",
-    "format": "prettier --write .",
+    "format": "prettier --print-width 200 --write ./index.js",
     "ci": "npm ci --prefer-offline --no-audit --progress=false"
   },
   "repository": {
@@ -33,7 +33,7 @@
   "dependencies": {
     "@actions/core": "^1.11.1",
     "@octokit/rest": "^22.0.0",
-    "@octokit/plugin-throttling": "^11.0.2"
+    "@octokit/plugin-throttling": "^11.0.3"
   },
   "devDependencies": {
     "@vercel/ncc": "^0.38.4",
