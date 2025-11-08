@@ -106,6 +106,39 @@ function shouldDeleteRun(run, options) {
   // All checks passed → delete
   return true;
 }
+/**
+ * Group runs by date and filter runs to retain per day
+ * @param {Array} runs
+ * @param {number} keepMinimumRunsPerDay
+ * @returns {Object} { runsToDelete: Array, runsToRetain: Array }
+ */
+function filterRunsByDailyRetention(runs, keepMinimumRunsPerDay) {
+  if (keepMinimumRunsPerDay <= 0) {
+    return { runsToDelete: runs, runsToRetain: [] };
+  }
+  // Group runs by date (YYYY-MM-DD)
+  const runsByDate = {};
+  runs.forEach(run => {
+    const date = new Date(run.created_at).toISOString().split('T')[0]; // Get YYYY-MM-DD
+    if (!runsByDate[date]) {
+      runsByDate[date] = [];
+    }
+    runsByDate[date].push(run);
+  });
+  const runsToDelete = [];
+  const runsToRetain = [];
+  // For each date, keep the latest keepMinimumRunsPerDay runs
+  Object.values(runsByDate).forEach(dateRuns => {
+    // Sort by creation time (newest first)
+    dateRuns.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+    // Keep the latest N runs for this date
+    const retainedRuns = dateRuns.slice(0, keepMinimumRunsPerDay);
+    const deletedRuns = dateRuns.slice(keepMinimumRunsPerDay);
+    runsToRetain.push(...retainedRuns);
+    runsToDelete.push(...deletedRuns);
+  });
+  return { runsToDelete, runsToRetain };
+}
 async function run() {
   try {
     // ---------------------- 1. Parse Input Parameters ----------------------
@@ -118,6 +151,7 @@ async function run() {
     }
     const retainDays = Number(core.getInput("retain_days") || "30");
     const keepMinimumRuns = Number(core.getInput("keep_minimum_runs") || "6");
+    const useDailyRetention = parseBoolean(core.getInput("use_daily_retention"));
     const deleteWorkflowPattern = core.getInput("delete_workflow_pattern") || "";
     const deleteWorkflowByStatePattern = core.getInput("delete_workflow_by_state_pattern") || "ALL";
     const deleteRunByConclusionPattern = core.getInput("delete_run_by_conclusion_pattern") || "ALL";
@@ -135,7 +169,7 @@ async function run() {
           return retryAfter < 5;
         },
         onSecondaryRateLimit: (retryAfter, options) => {
-          core.warning(`Secondary limit: ${options.method} ${options.url}`);
+          core.warning(`Secondary rate limit: ${options.method} ${options.url}`);
         },
       },
     });
@@ -207,11 +241,23 @@ async function run() {
           retainDays,
         }),
       );
-      candidates.sort((a, b) => new Date(a.created_at) - new Date(b.created_at));
-      const runsToRetain = keepMinimumRuns > 0 ? candidates.slice(-keepMinimumRuns) : [];
-      const runsToDelete = keepMinimumRuns > 0 ? candidates.slice(0, candidates.length - keepMinimumRuns) : candidates;
-      if (runsToRetain.length > 0) {
-        core.info(`🔄 Retaining latest ${runsToRetain.length} run(s)`);
+      let runsToDelete = [];
+      let runsToRetain = [];
+      if (useDailyRetention) {
+        // Use daily retention strategy
+        const { runsToDelete: dailyRunsToDelete, runsToRetain: dailyRunsToRetain } = 
+          filterRunsByDailyRetention(candidates, keepMinimumRuns);
+        runsToDelete = dailyRunsToDelete;
+        runsToRetain = dailyRunsToRetain;
+        core.info(`📅 Daily retention: Keeping ${keepMinimumRuns} runs per day, retaining ${runsToRetain.length} runs total`);
+      } else {
+        // Use original strategy (keep latest N runs overall)
+        candidates.sort((a, b) => new Date(a.created_at) - new Date(b.created_at));
+        runsToRetain = keepMinimumRuns > 0 ? candidates.slice(-keepMinimumRuns) : [];
+        runsToDelete = keepMinimumRuns > 0 ? candidates.slice(0, candidates.length - keepMinimumRuns) : candidates;
+        if (runsToRetain.length > 0) {
+          core.info(`🔄 Retaining latest ${runsToRetain.length} run(s)`);
+        }
       }
       if (runsToDelete.length > 0) {
         core.info(`🚀 Deleting ${runsToDelete.length} run(s)`);

@@ -19,9 +19,13 @@ inputs:
     required: false
     default: "30"
   keep_minimum_runs:
-    description: "Minimum number of runs to keep per workflow"
+    description: "Minimum number of runs to keep per workflow (or per day if use_daily_retention is true)"
     required: false
     default: "6"
+  use_daily_retention:
+    description: "If true, keep_minimum_runs will be applied per day instead of overall"
+    required: false
+    default: "false"
   delete_workflow_pattern:
     description: "Workflow name or filename pattern (omit for all)"
     required: false
