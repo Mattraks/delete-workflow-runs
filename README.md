@@ -34,7 +34,7 @@ A GitHub Action to delete workflow runs in a repository. This Action uses JavaSc
 - Improved `delete_workflow_pattern` matching (supports name or filename).
 
 Notes:
-- Inputs names reflect the action's expected input keys. Do not change names in your workflow unless you have updated the Action code accordingly.
+- Input names reflect the action's expected input keys. Do not change names in your workflow unless you have updated the Action code accordingly.
 - If an input has a default value, it is optional in your workflow inputs.
 - For delete_workflow_pattern you can provide multiple filters separated by the pipe character `|` (interpreted as logical OR). For more complex matching, combine with other inputs.
 
@@ -46,12 +46,18 @@ The token used must allow the Action to list and delete workflow runs. Recommend
 
 Using `${{ github.token }}` in workflows is recommended for the current repository. For cross-repository operations or if you need broader scope, use a Personal Access Token (PAT) with `repo` scope and appropriate permissions.
 
-## Setup (development / publishing)
+## Setup
 
-1. Ensure `package.json` includes dependencies and a build script using `@vercel/ncc`.
-2. Run `npm install` and `npm run build` to generate `dist/index.js`.
-3. Commit the `dist/` folder (compiled bundle) to the repository. Do NOT commit `node_modules/` — use `.gitignore` to exclude it.
-4. Tag and release versions as needed (the action can be referenced by `@v2`, `@v2.1.0`, or a full SHA).
+To use this Action in your workflows:
+
+- Reference a released tag, the major tag, or a specific commit SHA, for example:
+  - uses: Mattraks/delete-workflow-runs@v2
+  - uses: Mattraks/delete-workflow-runs@v2.1.0
+  - uses: Mattraks/delete-workflow-runs@\<full-sha>
+- Ensure the workflow grants the Action the permissions it needs (actions: write, contents: read).
+- Provide a token via the `token` input. For operations on repositories other than the workflow repository or for private repositories, use a PAT with `repo` scope (store it in GitHub Secrets).
+- Configure inputs (retain_days, keep_minimum_runs, delete_workflow_pattern, etc.) per your policy. See the Examples section below for typical workflows (scheduled, manual, matrix).
+- For GitHub Enterprise Server, set `baseUrl` to your API base (e.g. `https://github.mycompany.com/api/v3`).
 
 ## Examples
 

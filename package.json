@@ -32,12 +32,12 @@
   },
   "dependencies": {
     "@actions/core": "^1.11.1",
-    "@octokit/rest": "^22.0.0",
+    "@octokit/rest": "^22.0.1",
     "@octokit/plugin-throttling": "^11.0.3"
   },
   "devDependencies": {
     "@vercel/ncc": "^0.38.4",
-    "eslint": "^9.38.0",
+    "eslint": "^9.39.1",
     "eslint-config-prettier": "^10.1.8",
     "jest": "^30.2.0",
     "prettier": "^3.6.2"

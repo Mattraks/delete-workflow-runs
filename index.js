@@ -16,7 +16,7 @@ const parseBoolean = (input, falsyValues = ["0", "no", "n", "false"]) => {
   return !falsyValues.includes(normalized);
 };
 /**
- * Split a comma-separated pattern into trimmed items.
+ * Split a comma- or pipe-separated pattern into trimmed items.
  * If pattern is empty/undefined returns an empty array.
  * @param {string|undefined} pattern
  * @returns {string[]}
@@ -37,7 +37,7 @@ async function deleteRuns(runs, context, dryRun, octokit, owner, repo) {
     core.debug(`[${context}] No runs to delete.`);
     return;
   }
-  const tasks = runs.map((run) => async () => {
+  const tasks = runs.map(run => async () => {
     if (dryRun) {
       core.info(`[dry-run] 🚀 Simulate deletion: Run ${run.id} (${context})`);
       return { status: "skipped", runId: run.id };
@@ -51,7 +51,7 @@ async function deleteRuns(runs, context, dryRun, octokit, owner, repo) {
       return { status: "failed", runId: run.id, error: err };
     }
   });
-  const results = await Promise.allSettled(tasks.map((t) => t()));
+  const results = await Promise.allSettled(tasks.map(t => t()));
   const summary = results.reduce(
     (acc, res) => {
       const status = res.status === "fulfilled" ? res.value?.status : null;
@@ -75,8 +75,7 @@ async function deleteRuns(runs, context, dryRun, octokit, owner, repo) {
  * @returns {boolean}
  */
 function shouldDeleteRun(run, options) {
-  const { checkPullRequestExist, checkBranchExistence, branchNames, allowedConclusions, retainDays } = options;
-  // Only completed runs are considered.
+  const { checkPullRequestExist, checkBranchExistence, branchNames, allowedConclusions, retainDays = 0, skipAgeCheck = false } = options;
   if (run.status !== "completed") {
     core.debug(`💬 Skip: Run ${run.id} status=${run.status}`);
     return false;
@@ -93,49 +92,71 @@ function shouldDeleteRun(run, options) {
     return false;
   }
   // Conclusion filter (if provided). If allowedConclusions is empty, that means "ALL".
-  if (allowedConclusions.length > 0 && !allowedConclusions.includes(run.conclusion)) {
-    core.debug(`💬 Skip: Run ${run.id} conclusion="${run.conclusion}" not allowed`);
-    return false;
+  if (allowedConclusions.length > 0) {
+    const runConclusion = String(run.conclusion ?? "").toLowerCase();
+    if (!allowedConclusions.includes(runConclusion)) {
+      core.debug(`💬 Skip: Run ${run.id} conclusion="${run.conclusion}" not allowed`);
+      return false;
+    }
   }
-  // Age filter
-  const ageDays = (Date.now() - new Date(run.created_at).getTime()) / 86400000;
-  if (ageDays < retainDays) {
-    core.debug(`💬 Skip: Run ${run.id} is ${ageDays.toFixed(1)} days old (< ${retainDays} days)`);
-    return false;
+  // Age filter only when requested
+  if (!skipAgeCheck && retainDays > 0) {
+    if (!run.created_at) {
+      core.debug(`💬 Skip age check: Run ${run.id} has no created_at`);
+      return false;
+    }
+    const ageDays = (Date.now() - new Date(run.created_at).getTime()) / 86400000;
+    if (ageDays < retainDays) {
+      core.debug(`💬 Skip: Run ${run.id} is ${ageDays.toFixed(1)} days old (< ${retainDays} days)`);
+      return false;
+    }
   }
-  // All checks passed → delete
   return true;
 }
 /**
  * Group runs by date and filter runs to retain per day
  * @param {Array} runs
- * @param {number} keepMinimumRunsPerDay
+ * @param {number} keepMinimumRuns
+ * @param {number} retainDays
  * @returns {Object} { runsToDelete: Array, runsToRetain: Array }
  */
-function filterRunsByDailyRetention(runs, keepMinimumRunsPerDay) {
-  if (keepMinimumRunsPerDay <= 0) {
-    return { runsToDelete: runs, runsToRetain: [] };
+function filterRunsByDailyRetention(runs, keepMinimumRuns, retainDays) {
+  if (keepMinimumRuns <= 0 || retainDays <= 0) {
+    return {
+      runsToDelete: runs,
+      runsToRetain: []
+    };
   }
-  // Group runs by date (YYYY-MM-DD)
+  const cutoffDate = new Date();
+  cutoffDate.setDate(cutoffDate.getDate() - retainDays);
+  const cutoffTime = cutoffDate.getTime();
   const runsByDate = {};
+  const expiredRuns = []; // older than retainDays → delete
   runs.forEach(run => {
-    const date = new Date(run.created_at).toISOString().split('T')[0]; // Get YYYY-MM-DD
-    if (!runsByDate[date]) {
-      runsByDate[date] = [];
+    if (!run?.created_at) {
+      // If no created_at treat as expired to be safe
+      expiredRuns.push(run);
+      return;
     }
-    runsByDate[date].push(run);
+    const runTime = new Date(run.created_at).getTime();
+    if (isNaN(runTime) || runTime < cutoffTime) {
+      expiredRuns.push(run);
+      return;
+    }
+    // Normalize date key via ISO to avoid locale variations
+    const dateKey = new Date(run.created_at).toISOString().split("T")[0]; // YYYY-MM-DD
+    if (!runsByDate[dateKey])
+      runsByDate[dateKey] = [];
+    runsByDate[dateKey].push(run);
   });
-  const runsToDelete = [];
   const runsToRetain = [];
-  // For each date, keep the latest keepMinimumRunsPerDay runs
+  const runsToDelete = [...expiredRuns];
   Object.values(runsByDate).forEach(dateRuns => {
-    // Sort by creation time (newest first)
-    dateRuns.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
-    // Keep the latest N runs for this date
-    const retainedRuns = dateRuns.slice(0, keepMinimumRunsPerDay);
-    const deletedRuns = dateRuns.slice(keepMinimumRunsPerDay);
-    runsToRetain.push(...retainedRuns);
-    runsToDelete.push(...deletedRuns);
+    dateRuns.sort((a, b) => new Date(b.created_at) - new Date(a.created_at)); // newest first
+    const retain = dateRuns.slice(0, keepMinimumRuns);
+    const del = dateRuns.slice(keepMinimumRuns);
+    runsToRetain.push(...retain);
+    runsToDelete.push(...del);
   });
   return { runsToDelete, runsToRetain };
 }
@@ -143,12 +164,15 @@ async function run() {
   try {
     // ---------------------- 1. Parse Input Parameters ----------------------
     const token = core.getInput("token");
+    if (!token)
+      throw new Error("Missing required input: token");
     const baseUrl = core.getInput("baseUrl");
     const repositoryInput = core.getInput("repository");
+    if (!repositoryInput)
+      throw new Error('Missing required input: repository (expected "owner/repo")');
     const [repoOwner, repoName] = repositoryInput.split("/");
-    if (!repoOwner || !repoName) {
+    if (!repoOwner || !repoName)
       throw new Error(`Invalid repository: "${repositoryInput}". Use "owner/repo".`);
-    }
     const retainDays = Number(core.getInput("retain_days") || "30");
     const keepMinimumRuns = Number(core.getInput("keep_minimum_runs") || "6");
     const useDailyRetention = parseBoolean(core.getInput("use_daily_retention"));
@@ -168,9 +192,7 @@ async function run() {
           core.warning(`Rate limit: ${options.method} ${options.url} — wait ${retryAfter}s`);
           return retryAfter < 5;
         },
-        onSecondaryRateLimit: (retryAfter, options) => {
-          core.warning(`Secondary rate limit: ${options.method} ${options.url}`);
-        },
+        onSecondaryRateLimit: () => core.warning("Secondary rate limit hit"),
       },
     });
     // ---------------------- 3. Fetch Workflows ----------------------
@@ -179,7 +201,7 @@ async function run() {
       repo: repoName,
       per_page: 100,
     });
-    const workflowIds = workflows.map((w) => w.id);
+    const workflowIds = workflows.map(w => w.id);
     // ---------------------- 4. Fetch Branches (if needed) ----------------------
     let branchNames = [];
     if (checkBranchExistence) {
@@ -188,8 +210,7 @@ async function run() {
           owner: repoOwner,
           repo: repoName,
           per_page: 100,
-        })
-      ).map((b) => b.name);
+        })).map(b => b.name);
       core.info(`💬 Found ${branchNames.length} branches`);
     }
     // ---------------------- 5. Delete Orphan Runs ----------------------
@@ -198,7 +219,7 @@ async function run() {
       repo: repoName,
       per_page: 100,
     });
-    const orphanRuns = allRuns.filter((run) => !workflowIds.includes(run.workflow_id));
+    const orphanRuns = allRuns.filter(run => !workflowIds.includes(run.workflow_id));
     if (orphanRuns.length > 0) {
       core.info(`👻 Found ${orphanRuns.length} orphan runs`);
       await deleteRuns(orphanRuns, "orphan runs", dryRun, octokit, repoOwner, repoName);
@@ -206,24 +227,30 @@ async function run() {
     // ---------------------- 6. Filter Workflows ----------------------
     let filteredWorkflows = workflows;
     if (deleteWorkflowPattern) {
-      const patterns = splitPattern(deleteWorkflowPattern);
+      const patterns = splitPattern(deleteWorkflowPattern).map(p => p.toLowerCase());
       if (patterns.length > 0) {
         core.info(`🔍 Filtering by patterns: ${patterns.join(", ")}`);
-        filteredWorkflows = filteredWorkflows.filter(({ name, path }) => {
-          const filename = path.replace(/^\.github\/workflows\//, "");
-          return patterns.some((p) => name.includes(p) || filename.includes(p));
+        filteredWorkflows = filteredWorkflows.filter(({
+          name,
+          path
+        }) => {
+          const filename = (path || "").replace(/^\.github\/workflows\//, "");
+          const nameLower = String(name || "").toLowerCase();
+          const filenameLower = String(filename || "").toLowerCase();
+          return patterns.some(p => nameLower.includes(p) || filenameLower.includes(p));
         });
       }
     }
     if (deleteWorkflowByStatePattern.toUpperCase() !== "ALL") {
-      const states = splitPattern(deleteWorkflowByStatePattern);
+      const states = splitPattern(deleteWorkflowByStatePattern).map(s => s.toLowerCase());
       core.info(`🔍 Filtering by state: ${states.join(", ")}`);
-      filteredWorkflows = filteredWorkflows.filter(({ state }) => states.includes(state));
+      filteredWorkflows = filteredWorkflows.filter(({
+        state
+      }) => states.includes(String(state ?? "").toLowerCase()));
     }
     core.info(`Processing ${filteredWorkflows.length} workflow(s)`);
     // ---------------------- 7. Process Each Workflow ----------------------
-    const allowedConclusionsAll = deleteRunByConclusionPattern.toUpperCase() === "ALL";
-    const allowedConclusions = allowedConclusionsAll ? [] : splitPattern(deleteRunByConclusionPattern);
+    const allowedConclusions = deleteRunByConclusionPattern.toUpperCase() === "ALL" ? [] : splitPattern(deleteRunByConclusionPattern).map(c => c.toLowerCase());
     for (const workflow of filteredWorkflows) {
       core.startGroup(`Processing: ${workflow.name} (ID: ${workflow.id})`);
       const runs = await octokit.paginate(octokit.rest.actions.listWorkflowRuns, {
@@ -232,32 +259,29 @@ async function run() {
         workflow_id: workflow.id,
         per_page: 100,
       });
-      const candidates = runs.filter((run) =>
+      // Pre-filter (branch, PR, conclusion, etc.)
+      const candidates = runs.filter(run =>
         shouldDeleteRun(run, {
           checkPullRequestExist,
           checkBranchExistence,
           branchNames,
           allowedConclusions,
-          retainDays,
-        }),
-      );
+          retainDays: useDailyRetention ? 0 : retainDays, // age handled later in daily mode
+          skipAgeCheck: useDailyRetention,
+        }),);
       let runsToDelete = [];
       let runsToRetain = [];
       if (useDailyRetention) {
-        // Use daily retention strategy
-        const { runsToDelete: dailyRunsToDelete, runsToRetain: dailyRunsToRetain } = 
-          filterRunsByDailyRetention(candidates, keepMinimumRuns);
-        runsToDelete = dailyRunsToDelete;
-        runsToRetain = dailyRunsToRetain;
-        core.info(`📅 Daily retention: Keeping ${keepMinimumRuns} runs per day, retaining ${runsToRetain.length} runs total`);
+        const { runsToDelete: del, runsToRetain: ret } = filterRunsByDailyRetention(candidates, keepMinimumRuns, retainDays);
+        runsToDelete = del;
+        runsToRetain = ret;
+        core.info(`🔄 Daily retention: Keeping up to ${keepMinimumRuns} runs/day for last ${retainDays} days`);
       } else {
-        // Use original strategy (keep latest N runs overall)
         candidates.sort((a, b) => new Date(a.created_at) - new Date(b.created_at));
         runsToRetain = keepMinimumRuns > 0 ? candidates.slice(-keepMinimumRuns) : [];
-        runsToDelete = keepMinimumRuns > 0 ? candidates.slice(0, candidates.length - keepMinimumRuns) : candidates;
-        if (runsToRetain.length > 0) {
+        runsToDelete = keepMinimumRuns > 0 ? candidates.slice(0, candidates.length - runsToRetain.length) : candidates;
+        if (runsToRetain.length > 0)
           core.info(`🔄 Retaining latest ${runsToRetain.length} run(s)`);
-        }
       }
       if (runsToDelete.length > 0) {
         core.info(`🚀 Deleting ${runsToDelete.length} run(s)`);
